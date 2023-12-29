@@ -402,5 +402,9 @@ return [
     | https://github.com/laravel-admin-extensions.
     |
     */
-    'extensions' => [],
+    'extensions' => [
+        'grid-lightbox' => [
+            'enable' => true,
+        ]
+    ],
 ];

@@ -100,7 +100,6 @@ class StockCategoryController extends AdminController
     protected function form()
     {
         $form = new Form(new StockCategory());
-
         $u = Admin::user();
         $form->hidden('company_id', __('Company id'))
             ->default($u->company_id);

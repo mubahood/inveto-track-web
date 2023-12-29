@@ -1,9 +1,9 @@
-php artisan make:model StockSubCategory -m
+php artisan make:model FinancialPeriod -m
 
-php artisan admin:make StockSubCategoryController --model=App\\Models\\StockSubCategory
+php artisan admin:make EmployeesController --model=App\\Models\\User
 
 
-php artisan make:migration add_more_data_to_users_table --table=admin_users
+php artisan make:migration add_email_to_users_table --table=admin_users
 
 
 php artisan migrate
