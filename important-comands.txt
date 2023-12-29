@@ -1,6 +1,10 @@
-php artisan make:model Company -m
+php artisan make:model StockSubCategory -m
 
-php artisan admin:make CompanyController --model=App\\Company
+php artisan admin:make StockSubCategoryController --model=App\\Models\\StockSubCategory
+
+
+php artisan make:migration add_more_data_to_users_table --table=admin_users
+
 
 php artisan migrate
 
