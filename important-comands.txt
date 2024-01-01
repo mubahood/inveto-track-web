@@ -1,9 +1,10 @@
-php artisan make:model Utils -m
+php artisan make:model StockRecord -m
 
-php artisan admin:make StockItemController --model=App\\Models\\StockItem
+php artisan admin:make StockRecordController --model=App\\Models\\StockRecord
 
 
-php artisan make:migration add_email_to_users_table --table=admin_users
+
+php artisan make:migration add_in_stock_stock_sub_categories --table=stock_sub_categories
 
 
 php artisan migrate

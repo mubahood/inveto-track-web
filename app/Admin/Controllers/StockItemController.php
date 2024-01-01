@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\StockCategory;
 use App\Models\StockItem;
 use App\Models\StockSubCategory;
 use App\Models\Utils;
@@ -27,6 +28,8 @@ class StockItemController extends AdminController
      */
     protected function grid()
     {
+       /*  $item = StockItem::find(1);die('done'); */
+
         $grid = new Grid(new StockItem());
 
         $grid->column('id', __('Id'));
@@ -122,11 +125,6 @@ class StockItemController extends AdminController
         $form->text('name', __('Name'))->rules('required');
         $form->image('image', __('Image'))
             ->uniqueName();
-
-
-        $form->text('sku', __('SKU'));
-
-
 
 
         if ($form->isEditing()) {
