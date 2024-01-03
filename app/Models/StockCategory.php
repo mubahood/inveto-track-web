@@ -33,6 +33,15 @@ class StockCategory extends Model
         $this->expected_profit = $total_expected_profit;
         $this->save();
     }
+
+    
+    protected $appends = ['name_text'];
+
+    //name_text
+    public function getNameTextAttribute()
+    {
+        return $this->name . " (" . $this->code . ")";
+    } 
     /* 
         "earned_profit" => 0
 */
