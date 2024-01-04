@@ -4,7 +4,7 @@ php artisan admin:make StockRecordController --model=App\\Models\\StockRecord
 
 
 
-php artisan make:migration add_in_stock_stock_sub_categories --table=stock_sub_categories
+php artisan make:migration add_financial_period_id_to --table=stock_records
 
 
 php artisan migrate

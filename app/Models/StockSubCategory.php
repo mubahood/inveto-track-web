@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class StockSubCategory extends Model
 {
     use HasFactory;
+    
 
 
     //update_self
@@ -45,11 +46,13 @@ class StockSubCategory extends Model
             $this->in_stock = 'No';
         }
 
+        //earned_profit
+        $this->earned_profit = StockRecord::where('stock_sub_category_id', $this->id)
+            ->where('financial_period_id', $active_financial_period->id)
+            ->sum('profit');
+
         $this->save();
     }
-    /* 
-    "earned_profit" => 0
-*/
 
     public function stockCategory()
     {

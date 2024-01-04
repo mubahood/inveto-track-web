@@ -28,20 +28,26 @@ class StockCategory extends Model
 
         $total_expected_profit = $total_selling_price - $total_buying_price;
 
+
+        $this->earned_profit = StockRecord::where('stock_category_id', $this->id)
+            ->where('financial_period_id', $active_financial_period->id)
+            ->sum('profit');
+
+
         $this->buying_price = $total_buying_price;
         $this->selling_price = $total_selling_price;
         $this->expected_profit = $total_expected_profit;
         $this->save();
     }
 
-    
+
     protected $appends = ['name_text'];
 
     //name_text
     public function getNameTextAttribute()
     {
         return $this->name . " (" . $this->code . ")";
-    } 
+    }
     /* 
         "earned_profit" => 0
 */

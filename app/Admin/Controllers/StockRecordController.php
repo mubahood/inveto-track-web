@@ -104,17 +104,21 @@ class StockRecordController extends AdminController
                 }
             })->rules('required');
 
-        $form->number('stock_category_id', __('Stock category id'));
-        $form->number('stock_sub_category_id', __('Stock sub category id'));
-        $form->number('created_by_id', __('Created by id'));
-        $form->text('sku', __('Sku'));
-        $form->text('name', __('Name'));
-        $form->text('measurement_unit', __('Measurement unit'));
+
+        $form->hidden('created_by_id', __('Created by id'))->default($u->id);
+        $form->radio('type', __('Type'))
+            ->options(
+                [
+                    'Sale' => 'Sale',
+                    'Damage' => 'Damage',
+                    'Expired' => 'Expired',
+                    'Lost' => 'Lost',
+                    'Internal Use' => 'Internal Use',
+                    'Other' => 'Other'
+                ]
+            );
         $form->text('description', __('Description'));
-        $form->text('type', __('Type'));
-        $form->decimal('quantity', __('Quantity'));
-        $form->decimal('selling_price', __('Selling price'));
-        $form->decimal('total_sales', __('Total sales'));
+        $form->decimal('quantity', __('Quantity (Units)'))->rules('required');
 
         return $form;
     }

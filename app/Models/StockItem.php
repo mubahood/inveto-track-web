@@ -110,7 +110,7 @@ class StockItem extends Model
             $name_text =  $name_text . " - " . $this->stockSubCategory->name;
         }
         //add current quantity on name
-        $name_text = $name_text . " (" . number_format($this->current_quantity) . " " . $this->stockSubCategorymeasurement_unit . ")"; 
+        $name_text = $name_text . " (" . number_format($this->current_quantity) . " " . $this->stockSubCategory->measurement_unit . ")"; 
         return $name_text;
     }
 
