@@ -2,8 +2,11 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\StockCategory;
 use App\Models\StockItem;
 use App\Models\StockRecord;
+use App\Models\StockSubCategory;
+use App\Models\User;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -28,22 +31,104 @@ class StockRecordController extends AdminController
     {
         $grid = new Grid(new StockRecord());
 
-        $grid->column('id', __('Id'));
-        $grid->column('created_at', __('Created at'));
-        $grid->column('updated_at', __('Updated at'));
-        $grid->column('company_id', __('Company id'));
-        $grid->column('stock_item_id', __('Stock item id'));
-        $grid->column('stock_category_id', __('Stock category id'));
-        $grid->column('stock_sub_category_id', __('Stock sub category id'));
-        $grid->column('created_by_id', __('Created by id'));
-        $grid->column('sku', __('Sku'));
-        $grid->column('name', __('Name'));
-        $grid->column('measurement_unit', __('Measurement unit'));
-        $grid->column('description', __('Description'));
-        $grid->column('type', __('Type'));
-        $grid->column('quantity', __('Quantity'));
-        $grid->column('selling_price', __('Selling price'));
-        $grid->column('total_sales', __('Total sales'));
+        $grid->filter(function ($filter) {
+            $filter->disableIdFilter();
+            $filter->like('name', 'Name');
+            $u = Admin::user();
+
+            $filter->equal('stock_sub_category_id', 'Stock Sub Category')
+                ->select(StockSubCategory::where([
+                    'company_id' => $u->company_id
+                ])->pluck('name', 'id'));
+
+            $filter->equal('created_by_id', 'Created By')
+                ->select(User::where([
+                    'company_id' => $u->company_id
+                ])->pluck('name', 'id'));
+
+            $filter->equal('stock_category_id', 'Stock Category')
+                ->select(StockCategory::where([
+                    'company_id' => $u->company_id
+                ])->pluck('name', 'id'));
+        });
+
+        $grid->quickSearch('name');
+        $u = Admin::user();
+
+        $grid->disableBatchActions();
+        $grid->column('id', __('ID'))->sortable();
+        $grid->column('name', __('Name'))->sortable();
+
+        $grid->column('created_at', __('Date'))
+            ->display(function ($created_at) {
+                return date('Y-m-d', strtotime($created_at));
+            })->sortable();
+        $grid->column('stock_item_id', __('Stock Item'))
+            ->display(function ($stock_item_id) {
+                $stock_item = StockItem::find($stock_item_id);
+                if ($stock_item) {
+                    return $stock_item->name;
+                } else {
+                    return '';
+                }
+            })->sortable();
+
+        $grid->column('stock_category_id', __('Stock Category'))
+            ->display(function ($stock_category_id) {
+                $stock_category = StockCategory::find($stock_category_id);
+                if ($stock_category) {
+                    return $stock_category->name_text;
+                } else {
+                    return 'N/A';
+                }
+            })->sortable()
+            ->hide();
+        $grid->column('stock_sub_category_id', __('Stock Sub Category'))
+            ->display(function ($stock_sub_category_id) {
+                $stock_sub_category = StockSubCategory::find($stock_sub_category_id);
+                if ($stock_sub_category) {
+                    return $stock_sub_category->name_text;
+                } else {
+                    return 'N/A';
+                }
+            })->sortable();
+
+        $grid->column('created_by_id', __('Created'))
+            ->display(function ($created_by_id) {
+                $user = User::find($created_by_id);
+                if ($user) {
+                    return $user->name;
+                } else {
+                    return 'N/A';
+                }
+            })->sortable();
+
+        $grid->column('sku', __('Sku'))->hide();
+        $grid->column('description', __('Description'))->hide();
+        $grid->column('type', __('Type'))
+            ->dot([
+                'Sale' => 'success',
+                'Damage' => 'danger',
+                'Expired' => 'warning',
+                'Lost' => 'info',
+                'Internal Use' => 'primary',
+                'Other' => 'default'
+            ])->sortable();
+        $grid->column('quantity', __('Quantity'))->display(function ($quantity) {
+            return number_format($quantity) . " " . $this->measurement_unit;
+        })->sortable()
+            ->totalRow(function ($amount) {
+                return "<span class='text-danger'>" . number_format($amount) . "</span>";
+            });
+        $grid->column('selling_price', __('Selling Price'))->display(function ($selling_price) {
+            return number_format($selling_price);
+        })->sortable();
+        $grid->column('total_sales', __('Total Sales'))->display(function ($total_sales) {
+            return number_format($total_sales);
+        })->sortable()
+            ->totalRow(function ($amount) {
+                return "<span class='text-danger'>" . number_format($amount) . "</span>";
+            });
 
         return $grid;
     }

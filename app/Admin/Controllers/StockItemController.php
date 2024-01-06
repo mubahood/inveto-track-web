@@ -2,9 +2,11 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\FinancialPeriod;
 use App\Models\StockCategory;
 use App\Models\StockItem;
 use App\Models\StockSubCategory;
+use App\Models\User;
 use App\Models\Utils;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
@@ -28,30 +30,109 @@ class StockItemController extends AdminController
      */
     protected function grid()
     {
-       /*  $item = StockItem::find(1);die('done'); */
+        /*  $item = StockItem::find(1);die('done'); */
 
         $grid = new Grid(new StockItem());
 
-        $grid->column('id', __('Id'));
-        $grid->column('created_at', __('Created at'));
-        $grid->column('updated_at', __('Updated at'));
-        $grid->column('company_id', __('Company id'));
-        $grid->column('created_by_id', __('Created by id'));
-        $grid->column('stock_category_id', __('Stock category id'));
-        $grid->column('stock_sub_category_id', __('Stock sub category id'));
-        $grid->column('financial_period_id', __('Financial period id'));
-        $grid->column('name', __('Name'));
-        $grid->column('description', __('Description'));
-        $grid->column('image', __('Image'));
-        $grid->column('barcode', __('Barcode'));
-        $grid->column('sku', __('Sku'));
-        $grid->column('generate_sku', __('Generate sku'));
-        $grid->column('update_sku', __('Update sku'));
-        $grid->column('gallery', __('Gallery'));
-        $grid->column('buying_price', __('Buying price'));
-        $grid->column('selling_price', __('Selling price'));
-        $grid->column('original_quantity', __('Original quantity'));
-        $grid->column('current_quantity', __('Current quantity'));
+        $grid->filter(function ($filter) {
+            $filter->disableIdFilter();
+            $filter->like('name', 'Name');
+            $u = Admin::user();
+
+            $filter->equal('stock_sub_category_id', 'Stock Sub Category')
+                ->select(StockSubCategory::where([
+                    'company_id' => $u->company_id
+                ])->pluck('name', 'id'));
+
+            $filter->equal('financial_period_id', 'Financial Period')
+                ->select(FinancialPeriod::where([
+                    'company_id' => $u->company_id
+                ])->pluck('name', 'id'));
+
+            $filter->equal('created_by_id', 'Created By')
+                ->select(User::where([
+                    'company_id' => $u->company_id
+                ])->pluck('name', 'id'));
+
+            $filter->equal('stock_category_id', 'Stock Category')
+                ->select(StockCategory::where([
+                    'company_id' => $u->company_id
+                ])->pluck('name', 'id'));
+            $filter->like('sku', 'SKU');
+            $filter->between('buying_price', 'Buying Price')
+                ->decimal();
+            $filter->between('selling_price', 'Selling Price')
+                ->decimal();
+            $filter->between('current_quantity', 'Current quantity')
+                ->decimal();
+            $filter->equal('created_at', 'Created At')
+                ->date();
+        });
+
+        $u = Admin::user();
+        $grid->model()->where('company_id', $u->company_id);
+        $grid->disableBatchActions();
+        $grid->column('id', __('ID'))->sortable();
+
+        $grid->column('image', __('Photo'))
+            ->lightbox([
+                'width' => 50,
+                'height' => 50,
+            ])
+            ->sortable();
+        $grid->column('name', __('Product Name'))->sortable();
+
+        $grid->column('stock_category_id', __('Stock Category'))
+            ->display(function ($stock_category_id) {
+                $stock_category = StockCategory::find($stock_category_id);
+                if ($stock_category) {
+                    return $stock_category->name_text;
+                } else {
+                    return 'N/A';
+                }
+            })->sortable()
+            ->hide();
+        $grid->column('stock_sub_category_id', __('Stock Sub Category'))
+            ->display(function ($stock_sub_category_id) {
+                $stock_sub_category = StockSubCategory::find($stock_sub_category_id);
+                if ($stock_sub_category) {
+                    return $stock_sub_category->name_text;
+                } else {
+                    return 'N/A';
+                }
+            })->sortable();
+        $grid->column('financial_period_id', __('Financial Period'))
+            ->display(function ($financial_period_id) {
+                $financial_period = FinancialPeriod::find($financial_period_id);
+                if ($financial_period) {
+                    return $financial_period->name;
+                } else {
+                    return 'N/A';
+                }
+            })->sortable()
+            ->hide();
+        $grid->column('description', __('Description'))->hide();
+        $grid->column('barcode', __('Barcode'))->sortable();
+        $grid->column('sku', __('Sku'))->sortable();
+        $grid->column('buying_price', __('Buying Price'))->sortable();
+        $grid->column('selling_price', __('Selling Price'))->sortable();
+        $grid->column('original_quantity', __('Original quantity'))->sortable();
+        $grid->column('current_quantity', __('Current quantity'))->sortable();
+
+        $grid->column('created_by_id', __('Created'))
+            ->display(function ($created_by_id) {
+                $user = User::find($created_by_id);
+                if ($user) {
+                    return $user->name;
+                } else {
+                    return 'N/A';
+                }
+            })->sortable();
+
+        $grid->column('created_at', __('Created'))
+            ->display(function ($created_at) {
+                return date('Y-m-d', strtotime($created_at));
+            })->sortable();
 
         return $grid;
     }

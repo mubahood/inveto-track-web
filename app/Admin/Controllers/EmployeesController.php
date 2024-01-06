@@ -26,24 +26,36 @@ class EmployeesController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new User());
+        $u = Admin::user();
+        $grid->model()->where('company_id', $u->company_id);
 
-        $grid->column('id', __('Id'));
-        $grid->column('username', __('Username'));
-        $grid->column('password', __('Password'));
-        $grid->column('name', __('Name'));
-        $grid->column('avatar', __('Avatar'));
-        $grid->column('remember_token', __('Remember token'));
-        $grid->column('created_at', __('Created at'));
-        $grid->column('updated_at', __('Updated at'));
-        $grid->column('company_id', __('Company id'));
-        $grid->column('first_name', __('First name'));
-        $grid->column('last_name', __('Last name'));
+        $grid->quickSearch('first_name', 'last_name', 'phone_number', 'phone_number_2')
+            ->placeholder('Search by name or phone number');
+        $grid->disableBatchActions();
+
+        $grid->column('avatar', __('Photo'))->lightbox([
+            'width' => 50
+        ]);
+        $grid->column('name', __('Name'))->sortable();
         $grid->column('phone_number', __('Phone number'));
-        $grid->column('phone_number_2', __('Phone number 2'));
+        $grid->column('phone_number_2', __('Phone number 2'))->hide();
         $grid->column('address', __('Address'));
-        $grid->column('sex', __('Sex'));
-        $grid->column('dob', __('Dob'));
-        $grid->column('status', __('Status'));
+        $grid->column('sex', __('Gender'))
+            ->filter([
+                'Male' => 'Male',
+                'Female' => 'Female'
+            ])->sortable();
+        $grid->column('dob', __('Dob'))->sortable();
+        $grid->column('status', __('Status'))
+            ->dot([
+                'Active' => 'succcess',
+                'Inactive' => 'info',
+            ], 'info')->sortable();
+
+        $grid->column('created_at', __('Registered'))
+            ->display(function ($created_at) {
+                return date('Y-m-d', strtotime($created_at));
+            })->sortable();
 
         return $grid;
     }
@@ -115,7 +127,7 @@ class EmployeesController extends AdminController
 
 
 
-        $form->text('email', __('Username')); 
+        $form->text('email', __('Username'));
 
         $form->radio('status', __('Status'))
             ->options([

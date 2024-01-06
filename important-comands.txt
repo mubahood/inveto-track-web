@@ -1,11 +1,27 @@
 php artisan make:model StockRecord -m
 
-php artisan admin:make StockRecordController --model=App\\Models\\StockRecord
+php artisan admin:make CompanyEditController --model=App\\Models\\Company
 
 
 
-php artisan make:migration add_financial_period_id_to --table=stock_records
+php artisan make:migration add_currency_to_companies --table=companies
 
 
 php artisan migrate
+---
+- This week sales
+- 
+- Employes total*
+- In Stock
+
+- Financial Perio sales
+- Fincanial period sales/loses*
+- Stock Cats best/worst
+- Stock subcat - running out, best performer. worst (list)
+- Ricent stock items
+- Recent seles (list)
+- Stock cats by percentage (pie)
+
+
+
 
