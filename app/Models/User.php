@@ -21,7 +21,7 @@ class User extends Administrator
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
-    } 
+    }
 
     //boot
     protected static function boot()
@@ -42,7 +42,10 @@ class User extends Administrator
                 $model->name = $name;
             }
             $model->username = $model->email;
-            $model->password = bcrypt('admin');
+
+            if ($model->password == null || strlen($model->password) < 3) {
+                $model->password = bcrypt('admin');
+            }
             return $model;
         });
 

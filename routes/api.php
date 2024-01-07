@@ -1,11 +1,16 @@
 <?php
 
+use App\Http\Controllers\ApiController;
 use App\Models\StockItem;
 use App\Models\StockSubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 use function Laravel\Prompts\search;
+
+
+Route::post('auth/register', [ApiController::class, 'register']);
+Route::post('auth/login', [ApiController::class, 'login']);
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -36,7 +41,7 @@ Route::get('/stock-items', function (Request $request) {
     foreach ($sub_categories as $sub_category) {
         $data[] = [
             'id' => $sub_category->id,
-            'text' => $sub_category->sku." ".$sub_category->name_text,
+            'text' => $sub_category->sku . " " . $sub_category->name_text,
         ];
     }
 
