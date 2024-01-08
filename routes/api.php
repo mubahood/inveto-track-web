@@ -10,6 +10,8 @@ use function Laravel\Prompts\search;
 
 Route::post('auth/register', [ApiController::class, 'register']);
 Route::post('auth/login', [ApiController::class, 'login']);
+Route::post('api/{model}', [ApiController::class, 'my_update']);
+Route::get('api/{model}', [ApiController::class, 'my_list']);
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

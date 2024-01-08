@@ -4,9 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class Utils
 {
+
+    public static function get_user(Request $r)
+    {
+        $logged_in_user_id = $r->header('logged_in_user_id');
+        $u = User::find($logged_in_user_id);
+        return $u;
+    }
 
     public static function success($data, $message)
     {
@@ -15,8 +23,8 @@ class Utils
         http_response_code(200);
         echo json_encode([
             'code' => 1,
-            'data' => $data,
             'message' => $message,
+            'data' => $data,
         ]);
         die();
     }
@@ -27,8 +35,8 @@ class Utils
         http_response_code(200);
         echo json_encode([
             'code' => 0,
-            'data' => null,
             'message' => $message,
+            'data' => null,
         ]);
         die();
     }

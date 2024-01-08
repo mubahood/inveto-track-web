@@ -11,9 +11,74 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ApiController extends BaseController
 {
+
+
+    public function my_list(Request $r, $model)
+    {
+        $u = Utils::get_user($r);
+        if ($u == null) {
+            Utils::error("Unauthonticated.");
+        }
+        $model = "App\Models\\" . $model;
+        $data = $model::where('company_id', $u->company_id)->limit(100000)->get();
+        Utils::success($data, "Listed successfully.");
+    }
+
+
+
+
+
+    public function my_update(Request $r, $model)
+    {
+        $u = Utils::get_user($r);
+        if ($u == null) {
+            Utils::error("Unauthonticated.");
+        }
+        $model = "App\Models\\" . $model;
+        $object = $model::find($r->id);
+        $isEdit = true;
+        if ($object == null) {
+            $object = new $model();
+            $isEdit = false;
+        }
+
+
+        $table_name = $object->getTable();
+        $columns = Schema::getColumnListing($table_name);
+        $except = ['id', 'created_at', 'updated_at'];
+        $data = $r->all();
+
+        foreach ($data as $key => $value) {
+            if (!in_array($key, $columns)) {
+                continue;
+            }
+            if (in_array($key, $except)) {
+                continue;
+            }
+            $object->$key = $value;
+        }
+        $object->company_id = $u->company_id;
+
+        try {
+            $object->save();
+        } catch (\Exception $e) {
+            Utils::error($e->getMessage());
+        }
+        $new_object = $model::find($object->id);
+
+        if ($isEdit) {
+            Utils::success($new_object, "Updated successfully.");
+        } else {
+            Utils::success($new_object, "Created successfully.");
+        }
+    }
+
+
+
 
     public function login(Request $r)
     {
