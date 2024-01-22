@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Models\StockSubCategory;
 use App\Models\User;
 use App\Models\Utils;
 use Dflydev\DotAccessData\Util;
@@ -16,6 +17,38 @@ use Illuminate\Support\Facades\Schema;
 class ApiController extends BaseController
 {
 
+
+    public function file_uploading(Request $r)
+    {
+        $path = Utils::file_upload($r->file('photo'));
+        if ($path == '') {
+            Utils::error("File not uploaded.");
+        }
+        Utils::success([
+            'file_name' => $path,
+        ], "File uploaded successfully.");
+    }
+
+    public function manifest(Request $r)
+    {
+        $u = Utils::get_user($r);
+        if ($u == null) {
+            Utils::error("Unauthonticated.");
+        }
+        $roles = DB::table('admin_role_users')->where('user_id', $u->id)->get();
+        $company = Company::find($u->company_id);
+        $data = [
+            'name' => 'Invetor-Track',
+            'short_name' => 'IT',
+            'description' => 'Inventory Management System',
+            'version' => '1.0.0',
+            'author' => 'M. Muhido',
+            'user' => $u,
+            'roles' => $roles,
+            'company' => $company,
+        ];
+        Utils::success($data, "Success.");
+    }
 
     public function my_list(Request $r, $model)
     {
@@ -62,6 +95,26 @@ class ApiController extends BaseController
             $object->$key = $value;
         }
         $object->company_id = $u->company_id;
+
+
+        //temp_image_field
+        if ($r->temp_file_field != null) {
+            if (strlen($r->temp_file_field) > 1) {
+                $file  = $r->file('photo');
+                if ($file != null) {
+                    $path = "";
+                    try {
+                        $path = Utils::file_upload($r->file('photo'));
+                    } catch (\Exception $e) {
+                        $path = "";
+                    }
+                    if (strlen($path) > 3) {
+                        $fiel_name = $r->temp_file_field;
+                        $object->$fiel_name = $path;
+                    }
+                }
+            }
+        }
 
         try {
             $object->save();

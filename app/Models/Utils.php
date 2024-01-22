@@ -8,6 +8,19 @@ use Illuminate\Http\Request;
 
 class Utils
 {
+    public static function file_upload($file)
+    {
+        if ($file == null) {
+            return '';
+        }
+        //get file extension
+        $file_extension = $file->getClientOriginalExtension();
+        $file_name = time() . "_" . rand(1000, 100000) . "." . $file_extension;
+        $public_path = public_path() . "/storage/images";
+        $file->move($public_path, $file_name);
+        $url = 'images/' . $file_name;
+        return $url;
+    }
 
     public static function get_user(Request $r)
     {
