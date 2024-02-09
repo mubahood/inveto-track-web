@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Utils
 {
@@ -68,5 +69,17 @@ class Utils
         $serial = StockItem::where('stock_sub_category_id', $sub_category_id)->count() + 1;
         $sku = $year . "-" . $sub_category->id . "-" . $serial;
         return $sku;
+    }
+
+    static public function get_table_names()
+    {
+        $tables = DB::select('SHOW TABLES');
+        $db_name = env('DB_DATABASE');
+        $table_names = [];
+        $db_name = 'Tables_in_' . env("DB_DATABASE");
+        foreach ($tables as $key => $table) {
+            $table_names[$table->$db_name] = $table->$db_name;
+        }
+        return $table_names;
     }
 }
