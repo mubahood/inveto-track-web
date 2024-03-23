@@ -76,7 +76,7 @@ class Utils
         $tables = DB::select('SHOW TABLES');
         $db_name = env('DB_DATABASE');
         $table_names = [];
-        $db_name = 'Tables_in_' . env("DB_DATABASE");
+        $db_name = 'Tables_in_' . $db_name;
         foreach ($tables as $key => $table) {
             $table_names[$table->$db_name] = $table->$db_name;
         }

@@ -1,6 +1,6 @@
-php artisan make:model CodeGen -m
+php artisan make:model Gen -m
 
-php artisan admin:make CodeGenController --model=App\\Models\\CodeGen
+php artisan admin:make GenGenController --model=App\\Models\\Gen
 
 
 

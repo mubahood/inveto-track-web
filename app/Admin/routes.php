@@ -21,4 +21,5 @@ Route::group([
     $router->resource('stock-records', StockRecordController::class);
     $router->resource('companies-edit', CompanyEditController::class);
     $router->resource('gens', CodeGenController::class);
+    $router->resource('gen', GenGenController::class);
 });
