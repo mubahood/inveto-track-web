@@ -92,6 +92,12 @@ class ApiController extends BaseController
             if (in_array($key, $except)) {
                 continue;
             }
+            if ($value == null) {
+                continue;
+            }
+            if ($value == '') {
+                continue;
+            }
             $object->$key = $value;
         }
         $object->company_id = $u->company_id;
