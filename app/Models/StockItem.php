@@ -73,10 +73,10 @@ class StockItem extends Model
         $model->company_id = $user->company_id;
 
         if ($model->sku == null || strlen($model->sku) < 2) {
-            $model->sku = Utils::generateSKU($model->sub_category_id);
+            $model->sku = Utils::generateSKU($model->stock_sub_category_id);
         }
         if ($model->update_sku == "Yes" && $model->generate_sku == 'Manual') {
-            $model->sku = Utils::generateSKU($model->sub_category_id);
+            $model->sku = Utils::generateSKU($model->stock_sub_category_id);
             $model->generate_sku = "No";
         }
 
