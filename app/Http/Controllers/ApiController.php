@@ -72,7 +72,7 @@ class ApiController extends BaseController
             Utils::error("Unauthonticated.");
         }
         $model = "App\Models\\" . $model;
-        $object = $model::find($r->id);
+        $object = $model::find($r->get('id'));
         $isEdit = true;
         if ($object == null) {
             $object = new $model();

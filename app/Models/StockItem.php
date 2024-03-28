@@ -73,10 +73,10 @@ class StockItem extends Model
         $model->company_id = $user->company_id;
 
         if ($model->sku == null || strlen($model->sku) < 2) {
-            $model->sku = Utils::generateSKU($model->company_id);
+            $model->sku = Utils::generateSKU($model->sub_category_id);
         }
         if ($model->update_sku == "Yes" && $model->generate_sku == 'Manual') {
-            $model->sku = Utils::generateSKU($model->company_id);
+            $model->sku = Utils::generateSKU($model->sub_category_id);
             $model->generate_sku = "No";
         }
 
@@ -110,7 +110,7 @@ class StockItem extends Model
             $name_text =  $name_text . " - " . $this->stockSubCategory->name;
         }
         //add current quantity on name
-        $name_text = $name_text . " (" . number_format($this->current_quantity) . " " . $this->stockSubCategory->measurement_unit . ")"; 
+        $name_text = $name_text . " (" . number_format($this->current_quantity) . " " . $this->stockSubCategory->measurement_unit . ")";
         return $name_text;
     }
 
