@@ -31,17 +31,52 @@ class Company extends Model
             }
             $owner->company_id = $company->id;
             $owner->save();
+
+            //prepare
+            self::prepare_account_categories($company->id);
         });
+    }
 
 
-        //creating (before) 
-        //created (after)
 
-        //updating (before)
-        //updated (after)
+    static public function prepare_account_categories($company_id)
+    {
+        $company = Company::find($company_id);
+        if ($company == null) {
+            throw new \Exception("Company not found");
+        }
+        $sales_account_category = FinancialCategory::where([
+            ['company_id', '=', $company_id],
+            ['name', '=', 'Sales']
+        ])->first();
+        if ($sales_account_category == null) {
+            $sales_account_category = new FinancialCategory();
+            $sales_account_category->company_id = $company_id;
+            $sales_account_category->name = 'Sales';
+            $sales_account_category->save();
+        }
 
-        //deleting (before)
-        //deleted (after) 
+        $purchase_account_category = FinancialCategory::where([
+            ['company_id', '=', $company_id],
+            ['name', '=', 'Purchase']
+        ])->first();
+        if ($purchase_account_category == null) {
+            $purchase_account_category = new FinancialCategory();
+            $purchase_account_category->company_id = $company_id;
+            $purchase_account_category->name = 'Purchase';
+            $purchase_account_category->save();
+        }
 
+        $expense_account_category = FinancialCategory::where([
+            ['company_id', '=', $company_id],
+            ['name', '=', 'Expense']
+        ])->first();
+
+        if ($expense_account_category == null) {
+            $expense_account_category = new FinancialCategory();
+            $expense_account_category->company_id = $company_id;
+            $expense_account_category->name = 'Expense';
+            $expense_account_category->save();
+        }
     }
 }

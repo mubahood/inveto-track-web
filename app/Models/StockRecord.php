@@ -47,8 +47,7 @@ class StockRecord extends Model
             $model->quantity = $quantity;
 
             if (
-                $model->type == 'Sale' ||
-                $model->type == 'Internal Use'
+                $model->type == 'Sale'
             ) {
                 $model->total_sales = abs($model->total_sales);
                 $model->profit = $model->total_sales - ($stock_item->buying_price * $quantity);
@@ -81,6 +80,44 @@ class StockRecord extends Model
             }
             $stock_item->stockSubCategory->update_self();
             $stock_item->stockSubCategory->stockCategory->update_self();
+
+            $company = Company::find($model->company_id);
+            if ($company == null) {
+                throw new \Exception("Invalid Company.");
+            }
+
+            if ($model->type == 'Sale') {
+                $financial_category = FinancialCategory::where([
+                    ['company_id', '=', $company->id],
+                    ['name', '=', 'Sales']
+                ])->first();
+                if ($financial_category == null) {
+                    Company::prepare_account_categories($company->id);
+                    $financial_category = FinancialCategory::where([
+                        ['company_id', '=', $company->id],
+                        ['name', '=', 'Sales']
+                    ])->first();
+                    if ($financial_category == null) {
+                        throw new \Exception("Sales Account Category not found.");
+                    }
+                }
+                $fin_rec = new FinancialRecord();
+                $fin_rec->financial_category_id = $financial_category->id;
+                $fin_rec->company_id = $company->id;
+                $fin_rec->user_id = $model->created_by_id;
+                $fin_rec->created_by_id = $model->created_by_id;
+                $fin_rec->amount = $model->total_sales;
+                $fin_rec->quantity = $model->quantity;
+                $fin_rec->type = 'Income';
+                $fin_rec->payment_method = 'Cash';
+                $fin_rec->recipient = '';
+                $fin_rec->receipt = '';
+                $fin_rec->date = $model->date;
+                $fin_rec->description = 'Sales of #' . $model->id;
+                $fin_rec->financial_period_id = $model->financial_period_id;
+                $fin_rec->save();
+            }
+            //
         });
     }
 
