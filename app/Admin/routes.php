@@ -22,4 +22,6 @@ Route::group([
     $router->resource('companies-edit', CompanyEditController::class);
     $router->resource('gens', CodeGenController::class);
     $router->resource('gen', GenGenController::class);
+    $router->resource('financial-categories', FinancialCategoryController::class);
+
 });
