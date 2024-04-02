@@ -56,9 +56,6 @@ class StockRecord extends Model
                 $model->profit = 0;
             }
 
-
-
-
             $current_quantity = $stock_item->current_quantity;
             if ($current_quantity < $quantity) {
                 throw new \Exception("Insufficient Stock.");
