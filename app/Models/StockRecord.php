@@ -8,8 +8,41 @@ use Illuminate\Database\Eloquent\Model;
 class StockRecord extends Model
 {
     use HasFactory;
+    /*         
+            $table->foreignIdFor(Company::class);
+            $table->foreignIdFor(StockItem::class);
+            $table->foreignIdFor(StockCategory::class);
+            $table->foreignIdFor(StockSubCategory::class);
+            $table->foreignIdFor(User::class, 'created_by_id');
+            $table->string('sku')->nullable();
+            $table->string('name')->nullable();
+            $table->string('measurement_unit');
+            $table->string('description')->nullable();
+            $table->string('type');
+            $table->float('quantity');
+            $table->float('selling_price');
+            $table->float('total_sales'); */
+    //fillables for above
+    protected $fillable = [
+        'company_id',
+        'stock_item_id',
+        'stock_category_id',
+        'stock_sub_category_id',
+        'financial_period_id',
+        'created_by_id',
+        'sku',
+        'name',
+        'measurement_unit',
+        'description',
+        'type',
+        'quantity',
+        'selling_price',
+        'total_sales',
+        'profit',
+        'date',
+    ];
 
-    //boot
+
     protected static function boot()
     {
         parent::boot();

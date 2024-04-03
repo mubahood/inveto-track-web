@@ -1,10 +1,10 @@
-php artisan make:model FinancialCategory -m
+php artisan make:model FinancialRecord -m
 
-php artisan admin:make FinancialCategoryController --model=App\\Models\\FinancialCategory
+php artisan admin:make FinancialRecordController --model=App\\Models\\FinancialRecord
 
 
 
-php artisan make:migration add_created_by_id_to_financial_records --table=financial_records
+php artisan make:migration add_do_generate_financial_reports --table=financial_reports
 
 
 php artisan migrate

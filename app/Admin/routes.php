@@ -23,5 +23,7 @@ Route::group([
     $router->resource('gens', CodeGenController::class);
     $router->resource('gen', GenGenController::class);
     $router->resource('financial-categories', FinancialCategoryController::class);
+    $router->resource('financial-reports', FinancialReportController::class);
+    $router->resource('financial-records', FinancialRecordController::class);
 
 });

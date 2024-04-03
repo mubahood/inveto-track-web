@@ -18,4 +18,11 @@
  *
  */
 
+use App\Models\Utils;
+use Encore\Admin\Facades\Admin;
+
 Encore\Admin\Form::forget(['map', 'editor']);
+$u = Admin::user();
+if($u !=null){
+    Utils::generate_dummy($u);
+} 

@@ -2,8 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Company;
 use App\Models\FinancialCategory;
 use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -25,6 +27,15 @@ class FinancialCategoryController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new FinancialCategory());
+        $u = Admin::user();
+        if($u !=null){
+            $grid->model()->where('company_id', $u->company_id);
+        }
+        $cats = FinancialCategory::where('company_id', $u->company_id)->get();
+        if($cats->count() <= 0){
+            $company = $u->company;
+            Company::prepare_account_categories($company->id); 
+        } 
 
         $grid->column('id', __('Id'));
         $grid->column('created_at', __('Created at'));

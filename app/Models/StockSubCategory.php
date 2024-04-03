@@ -8,6 +8,24 @@ use Illuminate\Database\Eloquent\Model;
 class StockSubCategory extends Model
 {
     use HasFactory;
+
+    //fillables
+    protected $fillable = [
+        'company_id',
+        'stock_category_id',
+        'name',
+        'description',
+        'status',
+        'image',
+        'buying_price',
+        'selling_price',
+        'expected_profit',
+        'earned_profit',
+        'measurement_unit',
+        'current_quantity',
+        'reorder_level',
+        'in_stock',
+    ]; 
     
 
 

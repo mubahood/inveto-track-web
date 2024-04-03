@@ -10,6 +10,26 @@ class StockItem extends Model
     use HasFactory;
 
 
+    //fillables
+    protected $fillable = [
+        'company_id',
+        'created_by_id',
+        'stock_category_id',
+        'stock_sub_category_id',
+        'financial_period_id',
+        'name',
+        'description',
+        'image',
+        'barcode',
+        'sku',
+        'generate_sku',
+        'update_sku',
+        'gallery',
+        'buying_price',
+        'selling_price',
+        'original_quantity',
+        'current_quantity',
+    ];
     //boot
     protected static function boot()
     {

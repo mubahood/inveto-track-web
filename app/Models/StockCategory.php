@@ -7,6 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class StockCategory extends Model
 {
+
+    //fillables
+    protected $fillable = [
+        'company_id',
+        'name',
+        'description',
+        'status',
+        'image',
+        'buying_price',
+        'selling_price',
+        'expected_profit',
+        'earned_profit',
+        'measurement_unit',
+        'current_quantity',
+        'reorder_level',
+    ]; 
+
     use HasFactory;
 
     public function update_self()

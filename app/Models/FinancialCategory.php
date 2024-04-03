@@ -9,6 +9,9 @@ class FinancialCategory extends Model
 {
     use HasFactory;
 
+
+
+
     //boot
     protected static function boot()
     {
