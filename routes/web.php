@@ -2,6 +2,7 @@
 
 use App\Models\FinancialReport;
 use App\Models\Gen;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
 Route::get('financial-report', function () {
@@ -10,6 +11,13 @@ Route::get('financial-report', function () {
     if ($rep == null) {
         return die('Gen not found');
     }
+
+    $pdf = App::make('dompdf.wrapper');
+    $pdf->loadHTML(view('reports.financial-report', [
+        'data' => $rep
+    ]));
+    return $pdf->stream();
+
     //view reports.financial-report
     return view('reports.financial-report', ['data' => $rep]);
 });
