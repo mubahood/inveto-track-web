@@ -8,25 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class FinancialRecord extends Model
 {
     use HasFactory;
-
-    /*  
-created_at
-updated_at
-financial_category_id
-company_id
-user_id
-amount
-quantity
-type
-payment_method
-recipient
-description
-receipt
-date
-financial_period_id
-created_by_id 
-    */
-    //fillables based on above
+ 
     protected $fillable = [
         'financial_category_id',
         'company_id',

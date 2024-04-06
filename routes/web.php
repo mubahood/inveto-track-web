@@ -13,9 +13,29 @@ Route::get('financial-report', function () {
     }
 
     $pdf = App::make('dompdf.wrapper');
+    $company = $rep->company;
+
+    //check fi has logo and if it exisits
+    if ($company->logo != null) {
+        //$company->logo = public_path() . '/storage/' . $company->logo;
+    } else {
+        $company->logo = null;
+    }
+
     $pdf->loadHTML(view('reports.financial-report', [
-        'data' => $rep
+        'data' => $rep,
+        'company' => $company
     ]));
+
+    $model = $rep;
+    $pdf->render();
+    $output = $pdf->output();
+    $store_file_path = public_path('storage/files/report-' . $model->id . '.pdf');
+    file_put_contents($store_file_path, $output);
+    $model->file = 'files/report-' . $model->id . '.pdf';
+    $model->file_generated = 'Yes';
+
+
     return $pdf->stream();
 
     //view reports.financial-report

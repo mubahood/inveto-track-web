@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Dflydev\DotAccessData\Util;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,49 @@ use Illuminate\Support\Facades\DB;
 
 class Utils
 {
+    public static function my_date_3($t)
+    {
+        $c = Carbon::parse($t);
+        //set timezone
+        if ($t == null) {
+            return $t;
+        }
+        $c->setTimezone('Africa/Nairobi');
+        return $c->format('D d-m-Y');
+    }
+
+
+    public static function my_date($t)
+    {
+        $c = Carbon::parse($t);
+        if ($t == null) {
+            return $t;
+        }
+        $c->setTimezone('Africa/Nairobi');
+        return $c->format('d M, Y');
+    }
+
+    public static function my_date_time($t)
+    {
+        $c = Carbon::parse($t);
+        $c->setTimezone('Africa/Nairobi');
+        if ($t == null) {
+            return $t;
+        }
+        return $c->format('d M, Y - h:m a');
+    }
+
+    public static function to_date_time($raw)
+    {
+        $t = Carbon::parse($raw);
+        if ($t == null) {
+            return  "-";
+        }
+        $my_t = $t->toDateString();
+
+        return $my_t . " " . $t->toTimeString();
+    }
+
     public static function file_upload($file)
     {
         if ($file == null) {

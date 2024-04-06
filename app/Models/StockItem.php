@@ -108,7 +108,10 @@ class StockItem extends Model
     public function getGalleryAttribute($value)
     {
         if ($value != null && strlen($value) > 3) {
-            return json_decode($value);
+            $d = json_decode($value); 
+            if (is_array($d)) {
+                return $d;
+            }
         }
         return [];
     }
