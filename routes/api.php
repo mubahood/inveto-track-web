@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Route;
 use function Laravel\Prompts\search;
 
 
+Route::post('contribution-records-create', [ApiController::class, 'contribution_records_create']);
+
 Route::post('auth/register', [ApiController::class, 'register']);
 Route::post('auth/login', [ApiController::class, 'login']);
 Route::post('api/{model}', [ApiController::class, 'my_update']);

@@ -27,7 +27,8 @@ class DataExportController extends AdminController
     {
         $grid = new Grid(new DataExport());
 
-        $grid->column('created_at', __('Created'));
+        $grid->disableBatchActions();
+        $grid->column('created_at', __('Created'))->hide();
         $grid->column('treasurer_id', __('Treasurer'))
             ->display(function ($treasurer_id) {
                 $u = \App\Models\User::find($treasurer_id);
@@ -35,7 +36,7 @@ class DataExportController extends AdminController
                     return $u->name;
                 }
                 return 'N/A';
-            });
+            })->hide();
         $grid->column('category_id', __('Category'))
             ->sortable();
         /*         $grid->column('parameter_1', __('Parameter 1'));

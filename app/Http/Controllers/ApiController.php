@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Models\ContributionRecord;
 use App\Models\StockSubCategory;
 use App\Models\User;
 use App\Models\Utils;
@@ -59,6 +60,66 @@ class ApiController extends BaseController
         $model = "App\Models\\" . $model;
         $data = $model::where('company_id', $u->company_id)->limit(100000)->get();
         Utils::success($data, "Listed successfully.");
+    }
+
+
+
+
+
+    public function contribution_records_create(Request $r)
+    {
+        $u = Utils::get_user($r);
+        if ($u == null) {
+            Utils::error("Unauthonticated.");
+        }
+        $model = ContributionRecord::class;
+        $object = ContributionRecord::find($r->get('id'));
+        $isEdit = true;
+        if ($object == null) {
+            $object = new $model();
+            $isEdit = false;
+        }
+
+
+        $table_name = $object->getTable();
+        $columns = Schema::getColumnListing($table_name);
+        $except = ['id', 'created_at', 'updated_at'];
+        $data = $r->all();
+        
+
+        foreach ($data as $key => $value) {
+            if (!in_array($key, $columns)) {
+                continue;
+            }
+            if (in_array($key, $except)) {
+                continue;
+            }
+            if ($value == null) {
+                continue;
+            }
+            if ($value == '') {
+                continue;
+            }
+            $object->$key = $value;
+        }
+        $object->company_id = $u->company_id;
+ 
+        try {
+            $object->save();
+        } catch (\Exception $e) {
+            Utils::error($e->getMessage());
+        }
+        if($object == null){
+            Utils::error("Failed to save.");
+        } 
+        
+        $new_object = $model::find($object->id);
+
+        if ($isEdit) {
+            Utils::success($new_object, "Updated successfully.");
+        } else {
+            Utils::success($new_object, "Created successfully.");
+        }
     }
 
 
@@ -147,7 +208,7 @@ class ApiController extends BaseController
         }
         //check if email is valid
         if (!filter_var($r->email, FILTER_VALIDATE_EMAIL)) {
-            Utils::error("Email is invalid.");
+            //Utils::error("Email is invalid.");
         }
 
         //check if password is provided

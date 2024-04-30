@@ -29,27 +29,24 @@ class ContributionRecord extends Model
             ])->first();
             if ($withSameName) {
                 throw new \Exception('Name already exists');
-            } 
+            }
 
-        
-            $model->chaned_by_id = auth()->user()->id;
+
             $model = self::prepare($model);
             return $model;
         });
 
         static::updating(function ($model) {
-            $model->name = trim($model->name); 
+            $model->name = trim($model->name);
             $withSameName  = ContributionRecord::where([
                 'name' => $model->name,
                 'budget_program_id' => $model->budget_program_id,
-            ])->where('id', '!=', $model->id)->first(); 
+            ])->where('id', '!=', $model->id)->first();
             if ($withSameName) {
                 throw new \Exception('Name already exists');
-            } 
-             
+            }
 
-            //chaned_by_id as updated by
-            $model->chaned_by_id = auth()->user()->id;
+
             $model = self::prepare($model);
             return $model;
         });
@@ -62,22 +59,15 @@ class ContributionRecord extends Model
         //created
         static::created(function ($model) {
             self::finalizer($model);
-        }); 
+        });
     }
 
     //public static function prepare
     public static function prepare($data)
     {
-        $loggedUser = auth()->user();
-        if ($loggedUser == null) {
-            throw new \Exception('User not found');
-        }
+        $loggedUser = User::find($data->treasurer_id);
         $data->company_id = $loggedUser->company_id;
-        //budget_program_id if exists
-        $budget_program = BudgetProgram::where('company_id', $loggedUser->company_id)->orderBy('id', 'desc')->first();
-        if ($budget_program == null) {
-            throw new \Exception('Budget program not found');
-        }
+
         $custom_amount = (int) $data->custom_amount;
         if ($custom_amount > 0) {
             $data->amount = $custom_amount;
@@ -126,5 +116,5 @@ class ContributionRecord extends Model
         //first letter of first name
         $first = substr($treasurer->name, 0, 1);
         return strtoupper($first);
-    } 
+    }
 }
