@@ -25,5 +25,12 @@ Route::group([
     $router->resource('financial-categories', FinancialCategoryController::class);
     $router->resource('financial-reports', FinancialReportController::class);
     $router->resource('financial-records', FinancialRecordController::class);
+    $router->resource('budget-programs', BudgetProgramController::class);
+    $router->resource('contribution-records', ContributionRecordController::class);
+    $router->resource('handover-records', HandoverRecordController::class);
+    $router->resource('budget-item-categories', BudgetItemCategoryController::class);
+    $router->resource('budget-items', BudgetItemController::class);
+    $router->resource('data-exports', DataExportController::class);
+
 
 });

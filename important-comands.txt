@@ -1,10 +1,10 @@
-php artisan make:model FinancialRecord -m
+php artisan make:model DataExport -m
 
-php artisan admin:make FinancialRecordController --model=App\\Models\\FinancialRecord
+php artisan admin:make DataExportController --model=App\\Models\\DataExport
+//DataExport
 
 
-
-php artisan make:migration add_do_generate_financial_reports --table=financial_reports
+php artisan make:migration add_details_budget_items --table=budget_items
 
 
 php artisan migrate

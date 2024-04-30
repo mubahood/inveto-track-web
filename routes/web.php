@@ -1,10 +1,104 @@
 <?php
 
+use App\Models\ContributionRecord;
+use App\Models\DataExport;
 use App\Models\FinancialReport;
 use App\Models\Gen;
+use App\Models\Utils;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
+Route::get('thanks', function () {
+    $thanks = [
+        '[NAME] - [AMOUNT], Thank you so much.<br><br>May Allah bless you abundantly.<br>🧎',
+        '[NAME] - [AMOUNT], May Allah reward you abundantly.<br>🧎',
+        '[NAME] - [AMOUNT], Thank you so much for your contribution.<br>🧎',
+        '[NAME] - [AMOUNT], May Allah bless you abundantly.<br>🧎',
+        '[NAME] - [AMOUNT], May Allah reward you abundantly.<br>🧎',
+        '[NAME] - [AMOUNT], Thank you so much for your contribution.<br>🧎',
+        '[NAME] - [AMOUNT], May Allah bless you abundantly.<br>🧎',
+    ];
+    $record = ContributionRecord::find($_GET['id']);
+    $msg = $thanks[array_rand($thanks)];
+    $msg = str_replace('[NAME]', $record->name, $msg);
+    $paid = '✅';
+    if ($record->not_paid_amount > 0) {
+        $paid = '🅿️';
+    }
+    $msg = str_replace('[AMOUNT]', Utils::money_short($record->amount) . $paid, $msg);
+    echo $msg;
+    die();
+});
+Route::get('data-exports-print', function () {
+    $id = $_GET['id'];
+    $d = DataExport::find($id);
+    $recs
+        = ContributionRecord::where([
+            'category_id' => $d->category_id,
+        ])
+        ->orderBy('not_paid_amount', 'desc')->get();
+    $patially_paid = [];
+    $not_paid = [];
+    $fully_paid = [];
+    $pledged = 0;
+    $paid = 0;
+    $not_paid_amount = 0;
+    foreach ($recs as $rec) {
+        $pledged += $rec->amount;
+        $paid += $rec->paid_amount;
+        $not_paid_amount += $rec->not_paid_amount;
+        if ($rec->fully_paid == 'Yes') {
+            $fully_paid[] = $rec;
+        } else if ($rec->paid_amount > 0) {
+            $patially_paid[] = $rec;
+        } else {
+            $not_paid[] = $rec;
+        }
+    }
+
+    //last day 10th may
+    $last_dat = Carbon::create(2024, 5, 10, 0, 0, 0);
+    $days_left = Carbon::now()->diffInDays($last_dat);
+
+    echo '📌 *MUBARAKA\'s WEDDING CONTRIBUTIONS*';
+    echo '<br><br> 🗓️ : ' . $days_left . " Days left";
+    echo '<br><br>_*-----SUMMARY-------*_<br>' . "";
+
+    /*     echo '<br>*TOAL PLEDGED:* ' . number_format($pledged) . "<br>"; */
+    echo '*Cash Paid:✅* ' . number_format($paid) . "<br>";
+    echo '*PLEDGED:🅿️* ' . number_format($not_paid_amount) . "<br>";
+    echo '<br>*Fully Paid:* ' . count($fully_paid) . "<br>";
+    /* echo '*Partially Paid:* ' . count($patially_paid) . "<br>"; */
+    echo '*Not Paid:* ' . (count($not_paid) + count($patially_paid)) . "<br>";
+    echo '<br> *_PLEDGED MEMBERS_*' . "";
+    $i = 1;
+    foreach ($not_paid as $rec) {
+        echo "<br>$i. " . $rec->name . " - " . Utils::money_short($rec->not_paid_amount) . '🅿️';
+        $i++;
+    }
+
+    /*  echo '<br><br> *_PARTIALLY PAID MEMBERS_*' . "";
+    $i = 1; */
+    foreach ($patially_paid as $rec) {
+        echo "<br>$i. " . $rec->name . " - " . Utils::money_short($rec->paid_amount) . '✅' . $rec->tr() . ', ' . Utils::money_short($rec->not_paid_amount) . '🅿️';
+        $i++;
+    }
+
+    echo '<br><br> *_FULLY PAID MEMBERS_*' . "";
+    $i = 1;
+    foreach ($fully_paid as $rec) {
+        echo "<br>$i. " . $rec->name . " - " . Utils::money_short($rec->amount) . '✅' . $rec->tr();
+        $i++;
+    }
+
+    echo "<br><br>----------R.S.V.P:🙏-----------<br>";
+    echo '1. *Siama Saleh* - 0782349228 0706906707<br>';
+    echo '2. *Bwambale Muhidin* - 0762556385 0703903402 <br>';
+    echo '3. *Muhindo Mubaraka* - 0783204665 0706638494<br>';
+    echo '<br>*Jazakumullah Khairan* 🧎';
+    die();
+});
 Route::get('financial-report', function () {
     $id = request('id');
     $rep = FinancialReport::find($id);

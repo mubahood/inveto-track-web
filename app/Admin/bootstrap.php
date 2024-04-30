@@ -20,6 +20,7 @@
 
 use App\Models\Utils;
 use Encore\Admin\Facades\Admin;
+Utils::importRecs();
 
 Encore\Admin\Form::forget(['map', 'editor']);
 $u = Admin::user();

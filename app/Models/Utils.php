@@ -4,13 +4,17 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Dflydev\DotAccessData\Util;
+use Encore\Admin\Facades\Admin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use SplFileObject;
 
 class Utils
 {
+
+
     public static function my_date_3($t)
     {
         $c = Carbon::parse($t);
@@ -20,6 +24,20 @@ class Utils
         }
         $c->setTimezone('Africa/Nairobi');
         return $c->format('D d-m-Y');
+    }
+    //money shortten to to K, M, B
+    public static function money_short($money)
+    {
+        if ($money < 1000) {
+            return number_format($money);
+        }
+        if ($money < 1000000) {
+            return round($money / 1000, 2) . "K";
+        }
+        if ($money < 1000000000) {
+            return round($money / 1000000, 2) . "M";
+        }
+        return round($money / 1000000000, 2) . "B";
     }
 
 
@@ -317,5 +335,62 @@ current_quantity
             $category['earned_profit'] = 0;
             StockCategory::create($category);
         }
+    }
+
+
+    //public static function importRecs
+    public static function importRecs()
+    {
+        return;
+        $path = public_path('storage/files/budget.csv');
+        //check if file exists
+        if (!file_exists($path)) {
+            dd("File not found");
+        }
+
+        set_time_limit(-1);
+        $isFirst = true;
+        $items = [];
+        $csv = new SplFileObject($path);
+        $csv->setFlags(SplFileObject::READ_CSV);
+        $u = Admin::user();
+        $cat = BudgetItemCategory::where('name', 'Hom Renovation')->first();
+        if ($cat == null) {
+            die("Cat not found.");
+        }
+        foreach ($csv as $line) {
+            if ($isFirst) {
+                $isFirst = false;
+                continue;
+            }
+            $cat_name = $line[0];
+            if ($cat->name != $cat_name) {
+                continue;
+            }
+            $name = trim($line[1]);
+            $ex = BudgetItem::where([
+                'name' => $name,
+                'budget_item_category_id' => $cat->id
+            ])->first();
+            if ($ex != null) {
+                echo ("<br>Skipped $name because already exists.");
+                continue;
+            }
+            $item = new BudgetItem();
+            $item->name = $name;
+            $item->unit_price = ((int)($line[2]));
+            $item->quantity = ((int)$line[3]);
+            $item->target_amount = $item->unit_price * $item->quantity;
+            $item->invested_amount = ((int)$line[5]);
+            $item->approved = 'No';
+            $item->budget_program_id = $cat->budget_program_id;
+            $item->budget_item_category_id = $cat->id;
+            $item->company_id = $cat->company_id;
+            $item->created_by_id = $u->id;
+            $item->changed_by_id = $u->id;
+            $item->save();
+            echo $item->id . ". saved " . $item->name . "<br>";
+        }
+        //die("done");
     }
 }
