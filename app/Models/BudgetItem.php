@@ -119,4 +119,7 @@ class BudgetItem extends Model
         }
         return $this->category->name;
     }
+
+    //appends budget_item_category_text
+    protected $appends = ['budget_item_category_text']; 
 }
