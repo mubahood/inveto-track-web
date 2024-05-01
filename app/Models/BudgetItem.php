@@ -108,4 +108,12 @@ class BudgetItem extends Model
     {
         return $this->belongsTo(BudgetItemCategory::class, 'budget_item_category_id');
     }
+    //getter for budget_item_category_text
+    public function getBudgetItemCategoryTextAttribute()
+    {
+        if ($this->category == null) {
+            return 'N/A';
+        }
+        return $this->category->name;
+    }
 }
