@@ -9,6 +9,7 @@ use function Laravel\Prompts\search;
 
 
 Route::post('contribution-records-create', [ApiController::class, 'contribution_records_create']);
+Route::post('budget-item-create', [ApiController::class, 'budget_item_create']);
 
 Route::post('auth/register', [ApiController::class, 'register']);
 Route::post('auth/login', [ApiController::class, 'login']);

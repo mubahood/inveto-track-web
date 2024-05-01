@@ -158,13 +158,13 @@ class BudgetItemController extends AdminController
             ->rules('required');
         $form->hidden('created_by_id', __('Created by id'))->default($u->id);
         $form->hidden('changed_by_id', __('Changed by id'))->default($u->id);
-        $form->text('name', __('Name'));
         $form->decimal('unit_price', __('Quantity'));
         $form->decimal('quantity', __('Unit price'));
+        $form->divider();
+        $form->decimal('invested_amount', __('Invested amount'));
         $form->textarea('details', __('Remarks'));
 
         $form->hidden('approved', __('Invested amount'));
-        $form->hidden('invested_amount', __('Invested amount'));
         $form->hidden('is_complete', __('Is complete'));
 
         return $form;
