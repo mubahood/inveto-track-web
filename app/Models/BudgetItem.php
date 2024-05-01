@@ -66,7 +66,10 @@ class BudgetItem extends Model
     public static function prepare($data)
     {
         $data->target_amount = $data->unit_price * $data->quantity;
-        $loggedUser = auth()->user();
+        $loggedUser = User::find($data->created_by_id);
+        if ($loggedUser == null) {
+            throw new \Exception('User not found');
+        }
         $data->company_id = $loggedUser->company_id;
         $data->changed_by_id = $loggedUser->id;
         $cat = BudgetItemCategory::find($data->budget_item_category_id);
