@@ -91,7 +91,13 @@ class ContributionRecordController extends AdminController
             })->sortable()->sortable();
         $grid->column('chaned_by_id', __('Updated by'))
             ->display(function ($chaned_by_id) {
-                return \App\Models\User::find($chaned_by_id)->name;
+                $u = \App\Models\User::find($chaned_by_id);
+                if ($u == null) {
+                    $this->chaned_by_id = $this->treasurer_id;
+                    $this->save();
+                    return 'Unknown';
+                }
+                return $u->name;
             })->sortable()->hide();
 
         $grid->column('updated_at', __('Updated'))
