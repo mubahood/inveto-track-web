@@ -117,4 +117,27 @@ class ContributionRecord extends Model
         $first = substr($treasurer->name, 0, 1);
         return strtoupper($first);
     }
+
+    //appends for treasurer_text
+    protected $appends = ['treasurer_text', 'chaned_by_text'];
+
+    //getter for treasurer_text
+    public function getTreasurerTextAttribute()
+    {
+        $treasurer = User::find($this->treasurer_id);
+        if ($treasurer == null) {
+            return 'N/A';
+        }
+        return $treasurer->name;
+    }
+
+    //getter for chaned_by_text
+    public function getChanedByTextAttribute()
+    {
+        $changed_by = User::find($this->chaned_by_id);
+        if ($changed_by == null) {
+            return 'N/A';
+        }
+        return $changed_by->name;
+    }
 }
