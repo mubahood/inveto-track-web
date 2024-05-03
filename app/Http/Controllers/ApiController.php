@@ -86,7 +86,7 @@ class ApiController extends BaseController
         $columns = Schema::getColumnListing($table_name);
         $except = ['id', 'created_at', 'updated_at'];
         $data = $r->all();
-        
+
 
         foreach ($data as $key => $value) {
             if (!in_array($key, $columns)) {
@@ -104,16 +104,16 @@ class ApiController extends BaseController
             $object->$key = $value;
         }
         $object->company_id = $u->company_id;
- 
+
         try {
             $object->save();
         } catch (\Exception $e) {
             Utils::error($e->getMessage());
         }
-        if($object == null){
+        if ($object == null) {
             Utils::error("Failed to save.");
-        } 
-        
+        }
+
         $new_object = $model::find($object->id);
 
         if ($isEdit) {
@@ -133,6 +133,17 @@ class ApiController extends BaseController
         if ($u == null) {
             Utils::error("Unauthonticated.");
         }
+
+        //check if treasurer_id is not set and abort
+        if ($r->treasurer_id == null) {
+            Utils::error("Treasurer is required.");
+        } else {
+            $treasurer = User::find($r->treasurer_id);
+            if ($treasurer == null) {
+                Utils::error("Treasurer not found.");
+            }
+        }
+
         $model = ContributionRecord::class;
         $object = ContributionRecord::find($r->get('id'));
         $isEdit = true;
@@ -146,7 +157,7 @@ class ApiController extends BaseController
         $columns = Schema::getColumnListing($table_name);
         $except = ['id', 'created_at', 'updated_at'];
         $data = $r->all();
-        
+
 
         foreach ($data as $key => $value) {
             if (!in_array($key, $columns)) {
@@ -164,16 +175,17 @@ class ApiController extends BaseController
             $object->$key = $value;
         }
         $object->company_id = $u->company_id;
- 
+        $object->treasurer_id = $treasurer->id; //set treasurer_id
+
         try {
             $object->save();
         } catch (\Exception $e) {
             Utils::error($e->getMessage());
         }
-        if($object == null){
+        if ($object == null) {
             Utils::error("Failed to save.");
-        } 
-        
+        }
+
         $new_object = $model::find($object->id);
 
         if ($isEdit) {
