@@ -92,6 +92,7 @@ class ContributionRecord extends Model
         if ($data->fully_paid == 'Yes') {
             $data->not_paid_amount = 0;
         }
+        $data->treasurer_id = $loggedUser->id;
         return $data;
     }
 

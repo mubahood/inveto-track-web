@@ -134,6 +134,7 @@ class ApiController extends BaseController
             Utils::error("Unauthonticated.");
         }
 
+        $treasurer = null;
         //check if treasurer_id is not set and abort
         if ($r->treasurer_id == null) {
             Utils::error("Treasurer is required.");
