@@ -105,6 +105,55 @@ class BudgetItem extends Model
         DB::update($sql);
         $cat = BudgetItemCategory::find($data->budget_item_category_id);
         $cat->updateSelf();
+        $budget_download_link = url('budget-program-print?id='.$data->budget_program_id);
+        $unit_price = number_format($data->unit_price);
+        $quantity = number_format($data->quantity);
+        $invested_amount = number_format($data->invested_amount);
+        $balance = number_format($data->balance);
+        $mail_body = <<<EOD
+                    <p>Dear Admin,</p><br>
+                    <p>Budget item <b>{$data->name} - {$data->category->name}</b> has been updated.</p>
+                    <p><b>Quantity:</b> $unit_price</p>
+                    <p><b>Unit price:</b> {$quantity}</p>
+                    <p><b>Invested Amount:</b> {$invested_amount}</p>
+                    <p><b>Percentage Done:</b> {$percentage_done}%</p>
+                    <p><b>Balance:</b> {$balance}</p>
+                    <p>Click <a href="{$budget_download_link}">here to DOWNLOAD UPDATED Budget</a> pdf.</p>
+                    <br><p>Thank you.</p>
+                EOD;
+        $users = User::where([
+            'company_id' => $data->company_id
+        ])->get();
+        $emails = [];
+        foreach ($users as $key => $user) {
+            if (filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+                $emails[] = $user->email;
+            }
+            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+                if (in_array($user->username, $emails)) {
+                    continue;
+                }
+                $emails[] = $user->username;
+            }
+        }
+        if (!in_array('mubahood360@gmail.com', $emails)) {
+            $emails[] = 'mubahood360@gmail.com';
+        }
+        $program = BudgetProgram::find($data->budget_program_id);
+        $title = $program->name." -  Budget Updates.";
+     
+        $data['email'] = $emails;
+        $date = date('Y-m-d');
+        $data['subject'] = $title;
+        $data['body'] = $mail_body;
+        $data['data'] = $data['body'];
+        $data['name'] = 'Admin';
+     
+        try {
+            Utils::mail_sender($data);
+        } catch (\Throwable $th) {
+        }
+        
     }
 
     public function category()
@@ -121,5 +170,5 @@ class BudgetItem extends Model
     }
 
     //appends budget_item_category_text
-    protected $appends = ['budget_item_category_text']; 
+    protected $appends = ['budget_item_category_text'];
 }

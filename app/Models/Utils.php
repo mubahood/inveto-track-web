@@ -399,6 +399,11 @@ current_quantity
     //mail sender
     public static function mail_sender($data)
     {
+        /* die(view('mails/mail-1',
+        [
+            'body' => $data['body'],
+            'title' => $data['subject']
+        ])); */
         try {
             Mail::send(
                 'mails/mail-1',
