@@ -43,4 +43,73 @@ class BudgetProgram extends Model
         $data->company_id = $loggedUser->company_id;
         return $data;
     }
+
+    //belongs to company
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    //get categories
+    public function categories()
+    {
+        return $this->hasMany(BudgetItemCategory::class);
+    }
+    public function get_categories(){
+        $cats = BudgetItemCategory::where('budget_program_id', $this->id)
+        ->orderBy('target_amount', 'desc')
+        ->get();
+        return $cats;
+    }
+
+    //getter for budget_spent
+    public function getBudgetSpentAttribute($budget_spent)
+    {
+        $cats = BudgetItemCategory::where('budget_program_id', $this->id)
+            ->get();
+        $total = 0;
+        foreach ($cats as $cat) {
+            $total += $cat->invested_amount;
+        }
+        return $total;
+    } 
+
+    //getter for budget_total
+    public function getBudgetTotalAttribute($budget_total)
+    {
+        $cats = BudgetItemCategory::where('budget_program_id', $this->id)
+            ->get();
+        $total = 0;
+        foreach ($cats as $cat) {
+            $total += $cat->target_amount;
+        }
+        return $total;
+    } 
+
+    //getter for budget_balance
+    public function getBudgetBalanceAttribute($budget_balance)
+    {
+        $cats = BudgetItemCategory::where('budget_program_id', $this->id)
+            ->get();
+        $total = 0;
+        foreach ($cats as $cat) {
+            $total += $cat->balance;
+        }
+        return $total;
+    } 
+/* 
+
+created_at
+updated_at
+company_id
+name
+
+total_expected
+total_in_pledge
+budget_total
+
+
+	
+*/
+    
 }

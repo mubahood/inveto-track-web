@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\DataExport;
 use App\Models\StockRecord;
 use App\Models\User;
 use Encore\Admin\Controllers\Dashboard;
@@ -17,6 +18,7 @@ class HomeController extends Controller
 {
     public function index(Content $content)
     {
+        //dd((new DataExport())->getTable());
         $u = Admin::user();
         $company = Company::find($u->company_id);
 

@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\BudgetProgram;
 use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -26,11 +27,15 @@ class BudgetProgramController extends AdminController
     {
         $grid = new Grid(new BudgetProgram());
         $grid->disableBatchActions();
-        $grid->model()->orderBy('id', 'desc');
+        $u = Admin::user();
+        $grid->model()
+            ->where('company_id', $u->company_id)
+            ->orderBy('id', 'desc');
         $grid->column('created_at', __('Created'))
             ->display(function ($created_at) {
                 return date('d-m-Y H:i:s', strtotime($created_at));
-            })->sortable();
+            })->sortable()
+            ->hide();
         $grid->column('name', __('Name'))->sortable();
         $grid->column('total_collected', __('Total Collected'))
             ->display(function ($total_collected) {
@@ -55,6 +60,12 @@ class BudgetProgramController extends AdminController
             ->display(function ($budget_balance) {
                 return number_format($budget_balance);
             })->sortable();
+
+        //print column
+        $grid->column('print', __('Print'))->display(function () {
+            $link = url('budget-program-print?id=' . $this->id);
+            return "<a href='$link' target='_blank'>Print</a>";
+        });
 
         return $grid;
     }

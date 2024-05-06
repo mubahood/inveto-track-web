@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\BudgetProgram;
 use App\Models\ContributionRecord;
 use App\Models\DataExport;
 use App\Models\FinancialReport;
@@ -99,6 +100,7 @@ Route::get('data-exports-print', function () {
     echo '<br>*Jazakumullah Khairan* 🧎';
     die();
 });
+
 Route::get('financial-report', function () {
     $id = request('id');
     $rep = FinancialReport::find($id);
@@ -135,6 +137,44 @@ Route::get('financial-report', function () {
     //view reports.financial-report
     return view('reports.financial-report', ['data' => $rep]);
 });
+
+Route::get('budget-program-print', function () {
+    $id = request('id');
+    $rep = BudgetProgram::find($id);
+    if ($rep == null) {
+        return die('Gen not found');
+    }
+
+    $pdf = App::make('dompdf.wrapper');
+    $company = $rep->company;
+
+    //check fi has logo and if it exisits
+    if ($company->logo != null) {
+        //$company->logo = public_path() . '/storage/' . $company->logo;
+    } else {
+        $company->logo = null;
+    }
+
+    $rep->get_categories();
+    $pdf->loadHTML(view('reports.budget-report', [
+        'data' => $rep,
+        'company' => $company
+    ]));
+
+    $model = $rep;
+    $pdf->render();
+    $output = $pdf->output();
+    $store_file_path = public_path('storage/files/budget-' . $model->id . '.pdf');
+    file_put_contents($store_file_path, $output);
+    $model->file = 'files/budget-' . $model->id . '.pdf';
+
+
+    return $pdf->stream();
+
+    //view reports.financial-report
+    return view('reports.financial-report', ['data' => $rep]);
+});
+
 
 // Route get generate-models
 
