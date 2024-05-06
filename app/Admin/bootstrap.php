@@ -24,11 +24,11 @@ use Encore\Admin\Facades\Admin;
 
 Utils::importRecs();
 
-$d = BudgetItem::find(1);
+/* $d = BudgetItem::find(1);
 $d->details .= '1';
 $d->save(); 
 dd($d);
-
+ */
 Encore\Admin\Form::forget(['map', 'editor']);
 $u = Admin::user();
 if ($u != null) {

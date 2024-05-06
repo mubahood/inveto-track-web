@@ -105,7 +105,7 @@ class BudgetItem extends Model
         DB::update($sql);
         $cat = BudgetItemCategory::find($data->budget_item_category_id);
         $cat->updateSelf();
-        $budget_download_link = url('budget-program-print?id='.$data->budget_program_id);
+        $budget_download_link = url('budget-program-print?id=' . $data->budget_program_id);
         $unit_price = number_format($data->unit_price);
         $quantity = number_format($data->quantity);
         $invested_amount = number_format($data->invested_amount);
@@ -118,6 +118,7 @@ class BudgetItem extends Model
                     <p><b>Invested Amount:</b> {$invested_amount}</p>
                     <p><b>Percentage Done:</b> {$percentage_done}%</p>
                     <p><b>Balance:</b> {$balance}</p>
+                    <p><b>Details:</b> {$cat->details}</p>
                     <p>Click <a href="{$budget_download_link}">here to DOWNLOAD UPDATED Budget</a> pdf.</p>
                     <br><p>Thank you.</p>
                 EOD;
@@ -140,20 +141,19 @@ class BudgetItem extends Model
             $emails[] = 'mubahood360@gmail.com';
         }
         $program = BudgetProgram::find($data->budget_program_id);
-        $title = $program->name." -  Budget Updates.";
-     
+        $title = $program->name . " -  Budget Updates.";
+
         $data['email'] = $emails;
         $date = date('Y-m-d');
         $data['subject'] = $title;
         $data['body'] = $mail_body;
         $data['data'] = $data['body'];
         $data['name'] = 'Admin';
-     
+
         try {
             Utils::mail_sender($data);
         } catch (\Throwable $th) {
         }
-        
     }
 
     public function category()
