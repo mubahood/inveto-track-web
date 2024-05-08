@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\BudgetItemCategory;
 use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -15,7 +16,7 @@ class BudgetItemCategoryController extends AdminController
      *
      * @var string
      */
-    protected $title = 'BudgetItemCategory';
+    protected $title = 'Budge Item Categories';
 
     /**
      * Make a grid builder.
@@ -28,6 +29,10 @@ class BudgetItemCategoryController extends AdminController
 
         $grid->disableBatchActions();
         $grid->quickSearch('name');
+        $u = Admin::user();
+        $grid->model()
+            ->where('company_id', $u->company_id)
+            ->orderBy('target_amount', 'desc');
         $grid->column('id', __('Id'))->sortable();
         /*         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at')); */

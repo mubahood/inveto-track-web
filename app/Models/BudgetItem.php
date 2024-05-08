@@ -104,7 +104,13 @@ class BudgetItem extends Model
         is_complete = '$is_complete' WHERE id = $data->id";
         DB::update($sql);
         $cat = BudgetItemCategory::find($data->budget_item_category_id);
-        $cat->updateSelf();
+        
+        try {
+            $cat->updateSelf();
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+
         $budget_download_link = url('budget-program-print?id=' . $data->budget_program_id);
         $unit_price = number_format($data->unit_price);
         $quantity = number_format($data->quantity);

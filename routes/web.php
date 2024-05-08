@@ -34,10 +34,17 @@ Route::get('thanks', function () {
 Route::get('data-exports-print', function () {
     $id = $_GET['id'];
     $d = DataExport::find($id);
+    $conds = [
+        'category_id' => $d->category_id,
+    ];
+    if ($d->treasurer_id != null && $d->treasurer_id != 0) {
+        $t = \App\Models\User::find($d->treasurer_id);
+        if ($t != null) {
+            $conds['treasurer_id'] = $t->id;
+        }
+    }
     $recs
-        = ContributionRecord::where([
-            'category_id' => $d->category_id,
-        ])
+        = ContributionRecord::where($conds)
         ->orderBy('not_paid_amount', 'desc')->get();
     $patially_paid = [];
     $not_paid = [];

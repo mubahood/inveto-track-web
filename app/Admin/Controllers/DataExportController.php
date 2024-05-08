@@ -26,6 +26,10 @@ class DataExportController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new DataExport());
+        $u = Admin::user();
+        $grid->model()
+            ->where('company_id', $u->company_id)
+            ->orderBy('id', 'desc');
 
         $grid->disableBatchActions();
         $grid->column('created_at', __('Created'))->hide();
@@ -46,9 +50,9 @@ class DataExportController extends AdminController
         //print
         $grid->column('print', __('Print'))
             ->display(function ($print) {
-                $url = url('data-exports-print?id=' . $this->id );
+                $url = url('data-exports-print?id=' . $this->id);
                 return "<a href='$url' target='_blank'>Print</a>";
-            }); 
+            });
 
         return $grid;
     }

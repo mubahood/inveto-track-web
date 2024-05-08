@@ -27,7 +27,10 @@ class ContributionRecordController extends AdminController
     {
         $grid = new Grid(new ContributionRecord());
         $grid->disableBatchActions();
-        $grid->model()->orderBy('id', 'desc');
+        $u = Admin::user();
+        $grid->model()
+            ->where('company_id', $u->company_id)
+            ->orderBy('id', 'desc');
         $grid->filter(function ($filter) {
             $u = auth()->user();
             $users = \App\Models\User::where('company_id', $u->company_id)->get();
