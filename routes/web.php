@@ -40,7 +40,7 @@ Route::get('data-exports-print', function () {
     if ($d->treasurer_id != null && $d->treasurer_id != 0) {
         $t = \App\Models\User::find($d->treasurer_id);
         if ($t != null) {
-            $conds['treasurer_id'] = $t->id;
+            $conds = ['treasurer_id' => $t->id];
         }
     }
     $recs
