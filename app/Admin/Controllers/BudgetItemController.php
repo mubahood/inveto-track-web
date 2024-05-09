@@ -33,7 +33,7 @@ class BudgetItemController extends AdminController
         }
 
         $grid->quickSearch('name');
-        $grid->disableBatchActions();
+        //$grid->disableBatchActions();
         $grid->column('id', __('Id'))->sortable();
         $grid->column('created_at', __('Created'))->hide();
         $grid->column('budget_item_category_id', __('Category'))
