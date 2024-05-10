@@ -66,11 +66,20 @@ Route::get('data-exports-print', function () {
     }
 
     //last day 10th may
-    $last_dat = Carbon::create(2024, 5, 10, 0, 0, 0);
+    $last_dat = Carbon::create(2024, 5, 12, 0, 0, 0);
     $days_left = Carbon::now()->diffInDays($last_dat);
 
+    if($days_left < 0){
+        $days_left = 0;
+    }
+
+    $days_word = 'days';
+    if ($days_left == 1) {
+        $days_word = 'day';
+    }
+
     echo '📌 *MUBARAKA\'s WEDDING CONTRIBUTIONS*';
-    echo '<br><br> 🗓️ : ' . $days_left . " Days left";
+    echo '<br><br> 🗓️ : ' . $days_left . " $days_word left";
     echo '<br><br>_*-----SUMMARY-------*_<br>' . "";
 
     /*     echo '<br>*TOAL PLEDGED:* ' . number_format($pledged) . "<br>"; */
