@@ -168,6 +168,8 @@ class ContributionRecordController extends AdminController
         $form->select('budget_program_id', __('Budget program id'))->options($bp)
             ->default($first_id)
             ->required();
+        //company_id
+        $form->hidden('company_id')->default($u->company_id); 
 
 
         $form->text('name', __('Name of contributor'))->rules('required')->required();
