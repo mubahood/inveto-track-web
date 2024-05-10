@@ -240,7 +240,7 @@ class ContributionRecordController extends AdminController
 
         $u = Admin::user();
 
-        if (true) {
+        if (true) { //as admin
             $form->select('treasurer_id', __('Treasurer'))->options(\App\Models\User::where('company_id', $u->company_id)->pluck('name', 'id'))
                 ->required()
                 ->default($u->id);
