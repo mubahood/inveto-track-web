@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        return;
         Schema::table('contribution_records', function (Blueprint $table) {
             $table->string('category_id')->nullable()->default('Family'); 
         });

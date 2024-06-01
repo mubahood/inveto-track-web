@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        return;
         Schema::table('handover_records', function (Blueprint $table) {
             $table->bigInteger('amount')->nullable();
         });

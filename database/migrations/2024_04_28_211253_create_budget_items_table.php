@@ -13,6 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        return;
         Schema::create('budget_items', function (Blueprint $table) {
             $table->id();
             $table->timestamps();

@@ -11,10 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        return;
-        Schema::table('budget_items', function (Blueprint $table) {
-            $table->string('approved')->nullable()->default('No');
-        });
+        
     }
 
     /**

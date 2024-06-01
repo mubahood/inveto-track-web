@@ -103,9 +103,15 @@ class BudgetProgramController extends AdminController
     protected function form()
     {
         $form = new Form(new BudgetProgram());
-
         $form->text('name', __('Name'))->rules('required');
-        /*         $form->number('total_collected', __('Total collected'));
+        $form->radio('status', __('Status'))->rules('required')
+            ->options([
+                'Active' => 'Active',
+                'Inactive' => 'Inactive'
+            ])
+            ->default('Active');
+        /*
+        $form->number('total_collected', __('Total collected'));
         $form->number('total_expected', __('Total expected'));
         $form->number('total_in_pledge', __('Total in pledge'));
         $form->number('budget_total', __('Budget total'));

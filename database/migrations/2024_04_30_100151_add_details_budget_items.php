@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        return;
         Schema::table('budget_items', function (Blueprint $table) {
             $table->text('details')->nullable();
         });
     }
 
-    /**
+    /**~
      * Reverse the migrations.
      */
     public function down(): void

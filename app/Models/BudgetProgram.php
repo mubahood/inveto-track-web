@@ -99,17 +99,16 @@ class BudgetProgram extends Model
     } 
 /* 
 
-created_at
-updated_at
-company_id
-name
 
 total_expected
 total_in_pledge
 budget_total
 
-
 	
 */
+    //update self
+    public static function update_self(){
+        
+    }
     
 }
