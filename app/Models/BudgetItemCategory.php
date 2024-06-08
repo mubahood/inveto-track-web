@@ -23,8 +23,17 @@ class BudgetItemCategory extends Model
         if ($target_amount > 0) {
             $percentage_done = round(($invested_amount / $target_amount) * 100, 2);
         }
+
+        //is_complete
+        if ($balance <= 0) {
+            $this->is_complete = 'Yes';
+        } else {
+            $this->is_complete = 'No';
+        }
+
         $sql = "UPDATE {$table} SET target_amount = $target_amount, 
         balance = $balance, 
+        is_complete = '{$this->is_complete}',
         percentage_done = $percentage_done, 
         invested_amount = $invested_amount WHERE id = $this->id";
         DB::update($sql);
@@ -56,5 +65,11 @@ class BudgetItemCategory extends Model
             ->orderBy('target_amount', 'desc')
             ->get();
         return $cats;
+    }
+
+    //getter for name_text
+    public function getNameTextAttribute($name_text)
+    {
+        return $this->name . ' (' . number_format($this->balance) . ')';
     }
 }

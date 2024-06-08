@@ -16,7 +16,7 @@ class BudgetItemCategoryController extends AdminController
      *
      * @var string
      */
-    protected $title = 'Budge Item Categories';
+    protected $title = 'Budget Item Categories';
 
     /**
      * Make a grid builder.

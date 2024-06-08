@@ -110,7 +110,22 @@ class BudgetProgramController extends AdminController
                 'Inactive' => 'Inactive'
             ])
             ->default('Active');
+
+        $form->date('deadline', __('Deadline'));
+        $form->text('rsvp', __('RSVP'));
+        $form->image('logo', __('logo'))
+            ->uniqueName();
+        $form->text('is_default', __('Is this the default program?'))->rules('required')
+            ->options([
+                'Yes' => 'Yes',
+                'No' => 'No'
+            ]);
+
         /*
+        $table->string('is_active')->nullable();
+        $table->longText('groups')->nullable();
+
+
         $form->number('total_collected', __('Total collected'));
         $form->number('total_expected', __('Total expected'));
         $form->number('total_in_pledge', __('Total in pledge'));

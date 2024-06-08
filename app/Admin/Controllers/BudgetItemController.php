@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Models\BudgetItem;
 use App\Models\BudgetItemCategory;
 use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -32,10 +33,36 @@ class BudgetItemController extends AdminController
             $cats[$cat->id] = $cat->name;
         }
 
-        $grid->quickSearch('name');
+        $grid->disableBatchActions();
+        $u = Admin::user();
+        $grid->model()
+            ->where('company_id', $u->company_id)
+            ->orderBy('target_amount', 'desc');
+
+        $grid->filter(function ($filter) {
+            $filter->disableIdFilter();
+            /* $cats = [];
+            $u = Admin::user();
+            foreach (BudgetItemCategory::where([
+                'company_id' => $u->company_id,
+            ])->get() as $key => $cat) {
+                $cats[$cat->id] = $cat->name_text;
+            }
+            $filter->equal('budget_item_category_id', 'Category')->select($cats); */
+        });
+        $grid->quickSearch('name')->placeholder('Search by name');
         //$grid->disableBatchActions();
         $grid->column('id', __('Id'))->sortable();
         $grid->column('created_at', __('Created'))->hide();
+
+        $cats = [];
+        $u = Admin::user();
+        foreach (BudgetItemCategory::where([
+            'company_id' => $u->company_id,
+        ])->get() as $key => $cat) {
+            $cats[$cat->id] = $cat->name_text;
+        }
+
         $grid->column('budget_item_category_id', __('Category'))
             ->display(function ($amount) {
                 if ($this->category == null) {
@@ -84,7 +111,7 @@ class BudgetItemController extends AdminController
             ->switch([
                 'On' => 'Yes',
                 'Off' => 'No',
-            ]);
+            ])->hide(); 
         $grid->column('details', __('Remarks'))
             ->sortable()
             ->editable();
@@ -150,10 +177,13 @@ class BudgetItemController extends AdminController
         $form->hidden('company_id', __('Company'))->default($u->company_id);
         $form->text('name', __('Name'))->rules('required');
         $cats = [];
-        foreach (BudgetItemCategory::all() as $key => $cat) {
+        $u = Admin::user();
+        foreach (BudgetItemCategory::where([
+            'company_id' => $u->company_id,
+        ])->get() as $key => $cat) {
             $cats[$cat->id] = $cat->name;
         }
-        $form->select('budget_item_category_id', __('Budget Item Category'))
+        $form->radio('budget_item_category_id', __('Budget Item Category'))
             ->options($cats)
             ->rules('required');
         $form->hidden('created_by_id', __('Created by id'))->default($u->id);
