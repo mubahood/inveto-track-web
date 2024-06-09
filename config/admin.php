@@ -13,7 +13,7 @@ return [
     | login page.
     |
     */
-    'name' => 'InvetoTrack',
+    'name' => env('APP_NAME', 'Budget Pro'),
 
     /*
     |--------------------------------------------------------------------------
@@ -24,7 +24,7 @@ return [
     | `img` tag, eg '<img src="http://logo-url" alt="Admin logo">'.
     |
     */
-    'logo' => '<b>Inveto</b> admin',
+    'logo' => '<b>' . env('APP_NAME', 'Budget Pro') . '</b> admin',
 
     /*
     |--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ return [
     | '<img src="http://logo-url" alt="Admin logo">'.
     |
     */
-    'logo-mini' => '<b>ET</b>',
+    'logo-mini' => '<b>B.P</b>',
 
     /*
     |--------------------------------------------------------------------------
@@ -181,7 +181,7 @@ return [
         // User tables and model.
         'users_table' => 'admin_users',
         //'users_model' => Encore\Admin\Auth\Database\Administrator::class,
-        'users_model' => User::class, 
+        'users_model' => User::class,
 
         // Role table and model.
         'roles_table' => 'admin_roles',
