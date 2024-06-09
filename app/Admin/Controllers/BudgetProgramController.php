@@ -104,6 +104,9 @@ class BudgetProgramController extends AdminController
     {
         $form = new Form(new BudgetProgram());
         $form->text('name', __('Name'))->rules('required');
+        $form->text('title', __('Budget Title'))->rules('required');
+        $form->textarea('bottom', __('Bottom Text'));
+
         $form->radio('status', __('Status'))->rules('required')
             ->options([
                 'Active' => 'Active',

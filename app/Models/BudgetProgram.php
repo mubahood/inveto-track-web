@@ -55,10 +55,11 @@ class BudgetProgram extends Model
     {
         return $this->hasMany(BudgetItemCategory::class);
     }
-    public function get_categories(){
+    public function get_categories()
+    {
         $cats = BudgetItemCategory::where('budget_program_id', $this->id)
-        ->orderBy('target_amount', 'desc')
-        ->get();
+            ->orderBy('target_amount', 'desc')
+            ->get();
         return $cats;
     }
 
@@ -72,7 +73,7 @@ class BudgetProgram extends Model
             $total += $cat->invested_amount;
         }
         return $total;
-    } 
+    }
 
     //getter for budget_total
     public function getBudgetTotalAttribute($budget_total)
@@ -84,7 +85,7 @@ class BudgetProgram extends Model
             $total += $cat->target_amount;
         }
         return $total;
-    } 
+    }
 
     //getter for budget_balance
     public function getBudgetBalanceAttribute($budget_balance)
@@ -96,8 +97,8 @@ class BudgetProgram extends Model
             $total += $cat->balance;
         }
         return $total;
-    } 
-/* 
+    }
+    /* 
 
 
 total_expected
@@ -107,8 +108,16 @@ budget_total
 	
 */
     //update self
-    public static function update_self(){
-        
+    public static function update_self()
+    {
     }
-    
+
+    //GETTER FOR title
+    public function getTitleAttribute($title)
+    {
+        if ($title == null || $title == '') {
+            return $this->name;
+        }
+        return $title;
+    }
 }

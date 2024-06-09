@@ -399,6 +399,11 @@ current_quantity
     //mail sender
     public static function mail_sender($data)
     {
+        //check if .env APP_URL is contains localhost and return
+        if (strpos(env('APP_URL'), 'localhost') !== false) {
+            return;
+        } 
+        
         /* die(view('mails/mail-1',
         [
             'body' => $data['body'],

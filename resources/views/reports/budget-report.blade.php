@@ -55,16 +55,16 @@
             <td>
                 <div class="text-center">
                     <p class="fs-18 text-center fw-700 mt-2 text-uppercase  " style="color: black;">
-                        {{ $data->name }}</p>
+                        {{ $data->title }}</p>
                     <p class="fs-14 lh-6 mt-1">R.S.V.P:
-                        {{ $company->phone_number }},&nbsp;{{ $company->chairperson_phone_number }}
+                        {{ $data->rsvp }}
                     </p>
                     <p class="fs-14 lh-6 mt-1">EMAIL: {{ $company->email }}</p>
                 </div>
             </td>
             <td style="width: 16%">
-                @if ($company->logo != null)
-                    <img style="width: 80%; " src="{{ public_path('storage/' . $company->logo) }}">
+                @if ($data->logo != null)
+                    <img style="width: 80%; " src="{{ public_path('storage/' . $data->logo) }}">
                 @endif
             </td>
         </tr>
@@ -230,6 +230,10 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
+    <br>
+    <div>
+        {{ $data->bottom }}
     </div>
 
 

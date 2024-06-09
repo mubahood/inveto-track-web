@@ -69,7 +69,7 @@ Route::get('data-exports-print', function () {
     $last_dat = Carbon::create(2024, 5, 12, 0, 0, 0);
     $days_left = Carbon::now()->diffInDays($last_dat);
 
-    if($days_left < 0){
+    if ($days_left < 0) {
         $days_left = 0;
     }
 
@@ -164,12 +164,14 @@ Route::get('budget-program-print', function () {
     $pdf = App::make('dompdf.wrapper');
     $company = $rep->company;
 
-    //check fi has logo and if it exisits
-    if ($company->logo != null) {
-        //$company->logo = public_path() . '/storage/' . $company->logo;
-    } else {
-        $company->logo = null;
+    if ($rep->logo == null || strlen($rep->logo) < 2) {
+        $rep->logo = null;
     }
+
+    /* return view('reports.budget-report', [
+        'data' => $rep,
+        'company' => $company
+    ]); */
 
     $rep->get_categories();
     $pdf->loadHTML(view('reports.budget-report', [

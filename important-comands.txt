@@ -4,7 +4,7 @@ php artisan admin:make DataExportController --model=App\\Models\\DataExport
 //DataExport
 
 
-php artisan make:migration add_new_fields_to_budget_programs --table=budget_programs
+php artisan make:migration add_title_fields_to_budget_programs --table=budget_programs
 
 
 php artisan migrate
