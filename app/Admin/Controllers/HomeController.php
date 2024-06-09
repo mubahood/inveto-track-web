@@ -26,6 +26,7 @@ class HomeController extends Controller
             ->title($company->name . " - Dashboard")
             ->description('Hello ' . $u->name)
             ->row(function (Row $row) {
+                return $row;
                 $row->column(3, function (Column $column) {
                     $count = User::where('company_id', Admin::user()->company_id)->count();
                     $box = new Box('Employees', '<h3 style="text-align:right; margin: 0; font-size: 40px; font-weight: 800" >' . $count . '</h3>');
