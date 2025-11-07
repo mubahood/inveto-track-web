@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\StockCategory;
 use App\Models\StockSubCategory;
+use App\Services\CacheService;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -133,10 +134,8 @@ class StockSubCategoryController extends AdminController
         $form->hidden('company_id', __('Company id'))
             ->default($u->company_id);
 
-        $categories = StockCategory::where([
-            'company_id' => $u->company_id,
-            'status' => 'active'
-        ])->get()->pluck('name', 'id');
+        // Use cached stock categories
+        $categories = CacheService::getStockCategories($u->company_id)->pluck('name', 'id');
 
         $form->select('stock_category_id', __('Stock Category'))
             ->options($categories)

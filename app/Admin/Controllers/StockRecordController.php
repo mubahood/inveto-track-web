@@ -7,6 +7,7 @@ use App\Models\StockItem;
 use App\Models\StockRecord;
 use App\Models\StockSubCategory;
 use App\Models\User;
+use App\Services\CacheService;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -20,7 +21,7 @@ class StockRecordController extends AdminController
      *
      * @var string
      */
-    protected $title = 'Stock Out Records';
+    protected $title = 'Stock Records (In/Out)';
 
     /**
      * Make a grid builder.
@@ -36,20 +37,18 @@ class StockRecordController extends AdminController
             $filter->like('name', 'Name');
             $u = Admin::user();
 
+            // Use cached stock sub-categories
             $filter->equal('stock_sub_category_id', 'Stock Sub Category')
-                ->select(StockSubCategory::where([
-                    'company_id' => $u->company_id
-                ])->pluck('name', 'id'));
+                ->select(CacheService::getStockSubCategories($u->company_id)->pluck('name', 'id'));
 
             $filter->equal('created_by_id', 'Created By')
                 ->select(User::where([
                     'company_id' => $u->company_id
                 ])->pluck('name', 'id'));
 
+            // Use cached stock categories
             $filter->equal('stock_category_id', 'Stock Category')
-                ->select(StockCategory::where([
-                    'company_id' => $u->company_id
-                ])->pluck('name', 'id'));
+                ->select(CacheService::getStockCategories($u->company_id)->pluck('name', 'id'));
         });
 
         $grid->quickSearch('name');
@@ -108,12 +107,24 @@ class StockRecordController extends AdminController
         $grid->column('type', __('Type'))
             ->dot([
                 'Sale' => 'success',
+                'Stock In' => 'info',
+                'Adjustment' => 'primary',
                 'Damage' => 'danger',
                 'Expired' => 'warning',
-                'Lost' => 'info',
+                'Lost' => 'danger',
                 'Internal Use' => 'primary',
                 'Other' => 'default'
-            ])->sortable();
+            ])->sortable()
+            ->filter([
+                'Sale' => 'Sale',
+                'Stock In' => 'Stock In',
+                'Adjustment' => 'Adjustment',
+                'Damage' => 'Damage',
+                'Expired' => 'Expired',
+                'Lost' => 'Lost',
+                'Internal Use' => 'Internal Use',
+                'Other' => 'Other'
+            ]);
         $grid->column('quantity', __('Quantity'))->display(function ($quantity) {
             return number_format($quantity) . " " . $this->measurement_unit;
         })->sortable()
@@ -191,19 +202,33 @@ class StockRecordController extends AdminController
 
 
         $form->hidden('created_by_id', __('Created by id'))->default($u->id);
-        $form->radio('type', __('Type'))
+        
+        $form->date('date', __('Transaction Date'))
+            ->default(date('Y-m-d'))
+            ->rules('required');
+            
+        $form->radio('type', __('Transaction Type'))
             ->options(
                 [
-                    'Sale' => 'Sale',
-                    'Damage' => 'Damage',
-                    'Expired' => 'Expired',
-                    'Lost' => 'Lost',
-                    'Internal Use' => 'Internal Use',
-                    'Other' => 'Other'
+                    'Sale' => 'Sale (Stock Out - Revenue)',
+                    'Stock In' => 'Stock In (Add Inventory - Purchase)',
+                    'Adjustment' => 'Adjustment (Add/Correct Inventory)',
+                    'Damage' => 'Damage (Stock Out - Loss)',
+                    'Expired' => 'Expired (Stock Out - Loss)',
+                    'Lost' => 'Lost (Stock Out - Loss)',
+                    'Internal Use' => 'Internal Use (Stock Out)',
+                    'Other' => 'Other (Stock Out)'
                 ]
-            );
-        $form->text('description', __('Description'));
-        $form->decimal('quantity', __('Quantity (Units)'))->rules('required');
+            )
+            ->rules('required')
+            ->help('Sale = Generate revenue | Stock In = Purchase more inventory | Damage/Expired/Lost = Record losses');
+            
+        $form->decimal('quantity', __('Quantity (Units)'))
+            ->rules('required|min:0.01')
+            ->help('Enter the quantity to add (Stock In) or remove (Stock Out)');
+            
+        $form->textarea('description', __('Description/Notes'))
+            ->help('Optional: Add notes about this transaction');
 
         return $form;
     }

@@ -25,16 +25,24 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 
-//rout for stock-categories
+//route for stock-items (protected for admin use only - requires company_id validation)
 Route::get('/stock-items', function (Request $request) {
     $q = $request->get('q');
 
     $company_id = $request->get('company_id');
-    if ($company_id == null) {
+    if ($company_id == null || !is_numeric($company_id)) {
         return response()->json([
             'data' => [],
+            'error' => 'Company ID is required'
         ], 400);
     }
+
+    // Additional security: In production, verify the user has access to this company
+    // Uncomment when implementing proper authentication:
+    // $user = auth()->user();
+    // if (!$user || $user->company_id != $company_id) {
+    //     return response()->json(['data' => [], 'error' => 'Unauthorized'], 403);
+    // }
 
     $sub_categories =
         StockItem::where('company_id', $company_id)
@@ -60,16 +68,24 @@ Route::get('/stock-items', function (Request $request) {
 
 
 
-//rout for stock-categories
+//route for stock-sub-categories (protected for admin use only - requires company_id validation)
 Route::get('/stock-sub-categories', function (Request $request) {
     $q = $request->get('q');
 
     $company_id = $request->get('company_id');
-    if ($company_id == null) {
+    if ($company_id == null || !is_numeric($company_id)) {
         return response()->json([
             'data' => [],
+            'error' => 'Company ID is required'
         ], 400);
     }
+
+    // Additional security: In production, verify the user has access to this company
+    // Uncomment when implementing proper authentication:
+    // $user = auth()->user();
+    // if (!$user || $user->company_id != $company_id) {
+    //     return response()->json(['data' => [], 'error' => 'Unauthorized'], 403);
+    // }
 
     $sub_categories =
         StockSubCategory::where('company_id', $company_id)

@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\AuditLogger;
+use App\Traits\Cacheable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
-    use HasFactory;
+    use HasFactory, AuditLogger, Cacheable;
 
     //boot
     protected static function boot()

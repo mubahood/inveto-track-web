@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\Cacheable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class BudgetItemCategory extends Model
 {
-    use HasFactory;
+    use HasFactory, Cacheable;
 
 
 
@@ -17,7 +18,6 @@ class BudgetItemCategory extends Model
     {
         $target_amount = BudgetItem::where('budget_item_category_id', $this->id)->sum('target_amount');
         $invested_amount = BudgetItem::where('budget_item_category_id', $this->id)->sum('invested_amount');
-        $table = (new BudgetItemCategory())->getTable();
         $balance = $target_amount - $invested_amount;
         $percentage_done = 0;
         if ($target_amount > 0) {
@@ -31,12 +31,14 @@ class BudgetItemCategory extends Model
             $this->is_complete = 'No';
         }
 
-        $sql = "UPDATE {$table} SET target_amount = $target_amount, 
-        balance = $balance, 
-        is_complete = '{$this->is_complete}',
-        percentage_done = $percentage_done, 
-        invested_amount = $invested_amount WHERE id = $this->id";
-        DB::update($sql);
+        // Use Eloquent update instead of raw SQL to prevent SQL injection
+        $this->update([
+            'target_amount' => $target_amount,
+            'balance' => $balance,
+            'is_complete' => $this->is_complete,
+            'percentage_done' => $percentage_done,
+            'invested_amount' => $invested_amount
+        ]);
     }
 
     //getter for percentage_done

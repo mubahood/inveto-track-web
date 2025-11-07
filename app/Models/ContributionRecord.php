@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\AuditLogger;
+use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class ContributionRecord extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany, AuditLogger;
 
     //boot
     protected static function boot()

@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\DataExport;
 use App\Models\StockRecord;
 use App\Models\User;
+use App\Services\CacheService;
 use Encore\Admin\Controllers\Dashboard;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Column;
@@ -20,7 +21,9 @@ class HomeController extends Controller
     {
         //dd((new DataExport())->getTable());
         $u = Admin::user();
-        $company = Company::find($u->company_id);
+        
+        // Use cached company settings
+        $company = CacheService::getCompanySettings($u->company_id);
 
         return $content
             ->title($company->name . " - Dashboard")
@@ -42,7 +45,10 @@ class HomeController extends Controller
                     )
                         ->sum('total_sales');
                     $u = Admin::user();
-                    $company = Company::find($u->company_id);
+                    
+                    // Use cached company settings
+                    $company = CacheService::getCompanySettings($u->company_id);
+                    
                     $box = new Box('Todays sales', '<h3 style="text-align:right; margin: 0; font-size: 40px; font-weight: 800" >'
                         . $company->currency . " " . number_format($total_sales) .
                         '</h3>');

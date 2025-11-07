@@ -114,6 +114,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Notification Email
+    |--------------------------------------------------------------------------
+    |
+    | This email address will receive copies of all important notifications
+    | and updates from the system (e.g., budget updates, stock alerts).
+    |
+    */
+
+    'notification_email' => env('MAIL_NOTIFICATION_EMAIL', 'mubahood360@gmail.com'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Markdown Mail Settings
     |--------------------------------------------------------------------------
     |

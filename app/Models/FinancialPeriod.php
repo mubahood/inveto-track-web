@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToCompany;
+use App\Traits\Cacheable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class FinancialPeriod extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany, Cacheable;
 
     //boot
     protected static function boot()

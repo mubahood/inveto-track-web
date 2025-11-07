@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\Company;
 use App\Models\FinancialCategory;
+use App\Services\CacheService;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -31,7 +32,9 @@ class FinancialCategoryController extends AdminController
         if($u !=null){
             $grid->model()->where('company_id', $u->company_id);
         }
-        $cats = FinancialCategory::where('company_id', $u->company_id)->get();
+        
+        // Use cached financial categories
+        $cats = CacheService::getFinancialCategories($u->company_id);
         if($cats->count() <= 0){
             $company = $u->company;
             Company::prepare_account_categories($company->id); 

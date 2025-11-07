@@ -8,6 +8,7 @@ use App\Models\StockItem;
 use App\Models\StockSubCategory;
 use App\Models\User;
 use App\Models\Utils;
+use App\Services\CacheService;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -39,25 +40,22 @@ class StockItemController extends AdminController
             $filter->like('name', 'Name');
             $u = Admin::user();
 
+            // Use cached sub-categories
             $filter->equal('stock_sub_category_id', 'Stock Sub Category')
-                ->select(StockSubCategory::where([
-                    'company_id' => $u->company_id
-                ])->pluck('name', 'id'));
+                ->select(CacheService::getStockSubCategories($u->company_id)->pluck('name', 'id'));
 
+            // Use cached financial periods
             $filter->equal('financial_period_id', 'Financial Period')
-                ->select(FinancialPeriod::where([
-                    'company_id' => $u->company_id
-                ])->pluck('name', 'id'));
+                ->select(CacheService::getFinancialPeriods($u->company_id)->pluck('name', 'id'));
 
             $filter->equal('created_by_id', 'Created By')
                 ->select(User::where([
                     'company_id' => $u->company_id
                 ])->pluck('name', 'id'));
 
+            // Use cached stock categories
             $filter->equal('stock_category_id', 'Stock Category')
-                ->select(StockCategory::where([
-                    'company_id' => $u->company_id
-                ])->pluck('name', 'id'));
+                ->select(CacheService::getStockCategories($u->company_id)->pluck('name', 'id'));
             $filter->like('sku', 'SKU');
             $filter->between('buying_price', 'Buying Price')
                 ->decimal();

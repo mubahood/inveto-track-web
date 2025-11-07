@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BudgetItemRequest;
+use App\Http\Requests\ContributionRecordRequest;
+use App\Http\Requests\FileUploadRequest;
+use App\Http\Requests\GenericModelRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Models\BudgetItem;
 use App\Models\Company;
 use App\Models\ContributionRecord;
 use App\Models\StockSubCategory;
 use App\Models\User;
 use App\Models\Utils;
+use App\Services\CacheService;
 use Dflydev\DotAccessData\Util;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -20,7 +27,7 @@ class ApiController extends BaseController
 {
 
 
-    public function file_uploading(Request $r)
+    public function file_uploading(FileUploadRequest $r)
     {
         $path = Utils::file_upload($r->file('photo'));
         if ($path == '') {
@@ -38,7 +45,10 @@ class ApiController extends BaseController
             Utils::error("Unauthonticated.");
         }
         $roles = DB::table('admin_role_users')->where('user_id', $u->id)->get();
-        $company = Company::find($u->company_id);
+        
+        // Use cached company settings
+        $company = CacheService::getCompanySettings($u->company_id);
+        
         $data = [
             'name' => 'Invetor-Track',
             'short_name' => 'IT',
@@ -67,7 +77,7 @@ class ApiController extends BaseController
 
 
 
-    public function budget_item_create(Request $r)
+    public function budget_item_create(BudgetItemRequest $r)
     {
         $u = Utils::get_user($r);
         if ($u == null) {
@@ -85,7 +95,7 @@ class ApiController extends BaseController
         $table_name = $object->getTable();
         $columns = Schema::getColumnListing($table_name);
         $except = ['id', 'created_at', 'updated_at'];
-        $data = $r->all();
+        $data = $r->validated(); // Use validated data
 
 
         foreach ($data as $key => $value) {
@@ -127,22 +137,16 @@ class ApiController extends BaseController
 
 
 
-    public function contribution_records_create(Request $r)
+    public function contribution_records_create(ContributionRecordRequest $r)
     {
         $u = Utils::get_user($r);
         if ($u == null) {
             Utils::error("Unauthonticated.");
         }
 
-        $treasurer = null;
-        //check if treasurer_id is not set and abort
-        if ($r->treasurer_id == null) {
-            Utils::error("Treasurer is required.");
-        } else {
-            $treasurer = User::find($r->treasurer_id);
-            if ($treasurer == null) {
-                Utils::error("Treasurer not found.");
-            }
+        $treasurer = User::find($r->treasurer_id); // Already validated
+        if ($treasurer == null) {
+            Utils::error("Treasurer not found.");
         }
 
         $model = ContributionRecord::class;
@@ -157,7 +161,7 @@ class ApiController extends BaseController
         $table_name = $object->getTable();
         $columns = Schema::getColumnListing($table_name);
         $except = ['id', 'created_at', 'updated_at'];
-        $data = $r->all();
+        $data = $r->validated(); // Use validated data
 
 
         foreach ($data as $key => $value) {
@@ -200,7 +204,7 @@ class ApiController extends BaseController
 
 
 
-    public function my_update(Request $r, $model)
+    public function my_update(GenericModelRequest $r, $model)
     {
         $u = Utils::get_user($r);
         if ($u == null) {
@@ -218,7 +222,7 @@ class ApiController extends BaseController
         $table_name = $object->getTable();
         $columns = Schema::getColumnListing($table_name);
         $except = ['id', 'created_at', 'updated_at'];
-        $data = $r->all();
+        $data = $r->validated(); // Use validated data
 
         foreach ($data as $key => $value) {
             if (!in_array($key, $columns)) {
@@ -274,22 +278,8 @@ class ApiController extends BaseController
 
 
 
-    public function login(Request $r)
+    public function login(LoginRequest $r)
     {
-        //check if email is provided
-        if ($r->email == null) {
-            Utils::error("Email is required.");
-        }
-        //check if email is valid
-        if (!filter_var($r->email, FILTER_VALIDATE_EMAIL)) {
-            //Utils::error("Email is invalid.");
-        }
-
-        //check if password is provided
-        if ($r->password == null) {
-            Utils::error("Password is required.");
-        }
-
         $user = User::where('email', $r->email)->first();
         if ($user == null) {
             Utils::error("Account not found.");
@@ -311,43 +301,8 @@ class ApiController extends BaseController
     }
 
 
-    public function register(Request $r)
+    public function register(RegisterRequest $r)
     {
-
-        if ($r->first_name == null) {
-            Utils::error("First name is required.");
-        }
-        //check if last name is provided
-        if ($r->last_name == null) {
-            Utils::error("Last name is required.");
-        }
-        //check if email is provided
-        if ($r->email == null) {
-            Utils::error("Email is required.");
-        }
-        //check if email is valid
-        if (!filter_var($r->email, FILTER_VALIDATE_EMAIL)) {
-            Utils::error("Email is invalid.");
-        }
-
-        //check if email is already registered
-        $u = User::where('email', $r->email)->first();
-        if ($u != null) {
-            Utils::error("Email is already registered.");
-        }
-        //check if password is provided
-        if ($r->password == null) {
-            Utils::error("Password is required.");
-        }
-
-        //check if company name is provided
-        if ($r->company_name == null) {
-            Utils::error("Company name is required.");
-        }
-        if ($r->currency == null) {
-            Utils::error("Currency is required.");
-        }
-
         $new_user = new User();
         $new_user->first_name = $r->first_name;
         $new_user->last_name = $r->last_name;
@@ -390,7 +345,11 @@ class ApiController extends BaseController
             Utils::error("Failed to register company.");
         }
 
-        //DB instert into admin_role_users
+        //Update user's company_id
+        $registered_user->company_id = $registered_company->id;
+        $registered_user->save();
+
+        //DB insert into admin_role_users
         DB::table('admin_role_users')->insert([
             'user_id' => $registered_user->id,
             'role_id' => 2,

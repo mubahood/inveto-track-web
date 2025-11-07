@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\AuditLogger;
+use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class BudgetItem extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany, AuditLogger;
 
     //boot
     protected static function boot()
@@ -97,12 +99,14 @@ class BudgetItem extends Model
         } else {
             $is_complete = 'No';
         }
-        $table = (new self())->getTable();
-        $sql = "UPDATE $table SET 
-        balance = $balance, 
-        percentage_done = $percentage_done, 
-        is_complete = '$is_complete' WHERE id = $data->id";
-        DB::update($sql);
+        
+        // Use Eloquent update instead of raw SQL to prevent SQL injection
+        $data->update([
+            'balance' => $balance,
+            'percentage_done' => $percentage_done,
+            'is_complete' => $is_complete
+        ]);
+        
         $cat = BudgetItemCategory::find($data->budget_item_category_id);
         
         try {
@@ -111,55 +115,8 @@ class BudgetItem extends Model
             //throw $th;
         }
 
-        $budget_download_link = url('budget-program-print?id=' . $data->budget_program_id);
-        $unit_price = number_format($data->unit_price);
-        $quantity = number_format($data->quantity);
-        $invested_amount = number_format($data->invested_amount);
-        $balance = number_format($data->balance);
-        $mail_body = <<<EOD
-                    <p>Dear Admin,</p><br>
-                    <p>Budget item <b>{$data->name} - {$data->category->name}</b> has been updated.</p>
-                    <p><b>Quantity:</b> $unit_price</p>
-                    <p><b>Unit price:</b> {$quantity}</p>
-                    <p><b>Invested Amount:</b> {$invested_amount}</p>
-                    <p><b>Percentage Done:</b> {$percentage_done}%</p>
-                    <p><b>Balance:</b> {$balance}</p>
-                    <p><b>Details:</b> {$cat->details}</p>
-                    <p>Click <a href="{$budget_download_link}">here to DOWNLOAD UPDATED Budget</a> pdf.</p>
-                    <br><p>Thank you.</p>
-                EOD;
-        $users = User::where([
-            'company_id' => $data->company_id
-        ])->get();
-        $emails = [];
-        foreach ($users as $key => $user) {
-            if (filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
-                $emails[] = $user->email;
-            }
-            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
-                if (in_array($user->username, $emails)) {
-                    continue;
-                }
-                $emails[] = $user->username;
-            }
-        }
-        if (!in_array('mubahood360@gmail.com', $emails)) {
-            $emails[] = 'mubahood360@gmail.com';
-        }
-        $program = BudgetProgram::find($data->budget_program_id);
-        $title = $program->name . " -  Budget Updates.";
-
-        $data['email'] = $emails;
-        $date = date('Y-m-d');
-        $data['subject'] = $title;
-        $data['body'] = $mail_body;
-        $data['data'] = $data['body'];
-        $data['name'] = 'Admin';
-
-        try {
-            Utils::mail_sender($data);
-        } catch (\Throwable $th) {
-        }
+        // Queue email notification to prevent blocking
+        \App\Jobs\SendBudgetItemUpdateEmail::dispatch($data);
     }
 
     public function category()

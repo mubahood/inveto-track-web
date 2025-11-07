@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\BudgetItem;
 use App\Models\BudgetItemCategory;
+use App\Services\CacheService;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -28,13 +29,14 @@ class BudgetItemController extends AdminController
     {
         $grid = new Grid(new BudgetItem());
 
+        // Use cached budget item categories
+        $u = Admin::user();
         $cats = [];
-        foreach (BudgetItemCategory::all() as $key => $cat) {
+        foreach (CacheService::getBudgetItemCategories($u->company_id) as $cat) {
             $cats[$cat->id] = $cat->name;
         }
 
         $grid->disableBatchActions();
-        $u = Admin::user();
         $grid->model()
             ->where('company_id', $u->company_id)
             ->orderBy('target_amount', 'desc');
@@ -55,11 +57,9 @@ class BudgetItemController extends AdminController
         $grid->column('id', __('Id'))->sortable();
         $grid->column('created_at', __('Created'))->hide();
 
+        // Use cached categories again for display
         $cats = [];
-        $u = Admin::user();
-        foreach (BudgetItemCategory::where([
-            'company_id' => $u->company_id,
-        ])->get() as $key => $cat) {
+        foreach (CacheService::getBudgetItemCategories($u->company_id) as $cat) {
             $cats[$cat->id] = $cat->name_text;
         }
 
@@ -176,13 +176,14 @@ class BudgetItemController extends AdminController
             ->required();
         $form->hidden('company_id', __('Company'))->default($u->company_id);
         $form->text('name', __('Name'))->rules('required');
+        
+        // Use cached budget item categories
         $cats = [];
         $u = Admin::user();
-        foreach (BudgetItemCategory::where([
-            'company_id' => $u->company_id,
-        ])->get() as $key => $cat) {
+        foreach (CacheService::getBudgetItemCategories($u->company_id) as $cat) {
             $cats[$cat->id] = $cat->name;
         }
+        
         $form->radio('budget_item_category_id', __('Budget Item Category'))
             ->options($cats)
             ->rules('required');

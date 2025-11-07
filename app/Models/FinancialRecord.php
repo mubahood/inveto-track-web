@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\AuditLogger;
+use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class FinancialRecord extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany, AuditLogger;
  
     protected $fillable = [
         'financial_category_id',
